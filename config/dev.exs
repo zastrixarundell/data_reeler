@@ -25,6 +25,13 @@ config :data_reeler, DataReelerWeb.Endpoint,
   debug_errors: true,
   secret_key_base: "xXuLkB5D7oBEs2Vp9PwgK7pneLUpv2c6eZTkYGQKVZRWlF7WJSvWBvvSHXu+vxKS",
   watchers: []
+  
+config :crawly,
+  fetcher: {Crawly.Fetchers.Splash, [base_url: "http://localhost:8050/render.html"]},
+  pipelines: [
+    Crawly.Pipelines.JSONEncoder,
+    {Crawly.Pipelines.WriteToFile, extension: "jl", folder: "/tmp/data_reeler"}
+  ]
 
 # ## SSL Support
 #
