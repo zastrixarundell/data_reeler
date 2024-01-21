@@ -90,10 +90,12 @@ defmodule DataReeler.Crawlers.Plovakplus do
       price:
         document
         |> Floki.find("#primary")
+        |> Floki.find("p.price")
         |> Floki.find("span.woocommerce-Price-amount.amount")
         |> Floki.find("bdi")
-        |> Floki.text(deep: false)
-        |> String.trim(),
+        |> Stream.map(&Floki.text(&1, deep: false))
+        |> Stream.map(&String.trim/1)
+        |> Stream.map(&normalize_price/1),
         
       images: 
         document
@@ -136,6 +138,18 @@ defmodule DataReeler.Crawlers.Plovakplus do
       |> Stream.map(&Crawly.Utils.request_from_url/1)
     
     {[item], requests}
+  end
+  
+  defp normalize_price(price) when is_bitstring(price) do
+    price
+    |> String.replace(",", "")
+    |> String.replace(".", "")
+    |> String.to_integer()
+    |> Kernel./(100.00)
+  end
+  
+  defp normalize_price(_) do
+    -1
   end
   
   defp reject_uncategorized?({_, _, [text]}) when is_bitstring(text) do
