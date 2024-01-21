@@ -10,6 +10,7 @@ defmodule DataReeler.Application do
     children = [
       DataReelerWeb.Telemetry,
       DataReeler.Repo,
+      DataReeler.Servers.Plovakplus,
       {DNSCluster, query: Application.get_env(:data_reeler, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: DataReeler.PubSub},
       # Start a worker by calling: DataReeler.Worker.start_link(arg)
