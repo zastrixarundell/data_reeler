@@ -87,9 +87,13 @@ defmodule DataReeler.Crawlers.Plovakplus do
       description:
         document
         |> Floki.find("#primary")
-        |> Floki.find("div.description.woocommerce-product-details__short-description")
-        |> Floki.find("p")
+        |> Floki.find(
+          "div.description.woocommerce-product-details__short-description > p," <> " " <>
+          "div.description.woocommerce-product-details__short-description > div")
         |> Enum.map(&Floki.text/1)
+        |> Enum.map(&String.split(&1,"\n"))
+        |> List.flatten()
+        |> Enum.reject(&(&1==""))
         |> Enum.map(&String.trim/1),
         
       price:
