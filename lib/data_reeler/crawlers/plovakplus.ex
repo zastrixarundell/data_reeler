@@ -30,13 +30,15 @@ defmodule DataReeler.Crawlers.Plovakplus do
     %Crawly.ParsedItem{items: items, requests: requests |> Enum.to_list()}
   end
   
-  defp build_absolute_url(url), do: URI.merge(base_url(), url) |> to_string()
+  # Manually added
   
   @spec page_type(document :: Floki.html_tree()) :: :product | :landing
   defp page_type(document) do
     product_list =
       document
-      |> Floki.find("div#primary > main#content > div.archive-products")
+      |> Floki.find("div#primary")
+      |> Floki.find("main#content")
+      |> Floki.find("div.archive-products")
       
     if Enum.empty?(product_list) do
       :product
@@ -50,13 +52,16 @@ defmodule DataReeler.Crawlers.Plovakplus do
   @spec acquire_product_page_data(response :: HTTPoison.Response.t(), document :: Floki.html_tree())
     :: {items :: [map()], requests :: Enumerable.t(Crawly.Request.t())}
   defp acquire_product_page_data(response, document) do
-    
+    {[item!(document, response)], item_urls!(document)}
+  end
+  
+  defp item!(document, response) do
     posted_in =
       document
       |> Floki.find("#primary")
       |> Floki.find("span.posted_in")
-    
-    item = %{
+      
+    %{
       title:
         document
         |> Floki.find("#primary")
@@ -105,9 +110,19 @@ defmodule DataReeler.Crawlers.Plovakplus do
         |> Floki.attribute("src"),
         
       url: 
-        response.request.url
+        response.request.url,
+    
+      provider:
+        "plovakplus"
     }
-
+  end
+  
+  defp item_urls!(document) do
+    posted_in =
+      document
+      |> Floki.find("#primary")
+      |> Floki.find("span.posted_in")
+      
     related_products =
       document
         |> Floki.find(".related.products ul li")  
@@ -129,21 +144,17 @@ defmodule DataReeler.Crawlers.Plovakplus do
       |> Floki.find("a")
       |> Floki.attribute("href")
       
-    requests =
-      related_categories
-      |> Stream.concat(related_product_urls)
-      |> Stream.concat(category_url)
-      |> Stream.uniq()
-      |> Stream.map(&build_absolute_url/1)
-      |> Stream.map(&Crawly.Utils.request_from_url/1)
-    
-    {[item], requests}
+    related_categories
+    |> Stream.concat(related_product_urls)
+    |> Stream.concat(category_url)
+    |> Stream.uniq()
+    |> Stream.map(&build_absolute_url/1)
+    |> Stream.map(&Crawly.Utils.request_from_url/1)
   end
   
   defp normalize_price(price) when is_bitstring(price) do
     price
-    |> String.replace(",", "")
-    |> String.replace(".", "")
+    |> String.replace(~r/[,.]/, "")
     |> String.to_integer()
     |> Kernel./(100.00)
   end
@@ -184,4 +195,6 @@ defmodule DataReeler.Crawlers.Plovakplus do
       
     {[], requests}
   end
+  
+  defp build_absolute_url(url), do: URI.merge(base_url(), url) |> to_string()
 end
