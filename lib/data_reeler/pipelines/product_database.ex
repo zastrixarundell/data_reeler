@@ -8,6 +8,13 @@ defmodule DataReeler.Pipelines.ProductDatabase do
     
     Logger.debug("Calling custom pipeline with structure: #{inspect(item)}")
     
+    case DataReeler.Stores.upsert_product_by_sku_and_provider(item) do
+      {:ok, _} ->
+        nil
+      {:error, error} ->
+        Logger.warning("Falied to insert production #{inspect(item)} with error: #{inspect(error)}")
+    end
+    
     {item, state}
   end
 end

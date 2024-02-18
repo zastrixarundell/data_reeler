@@ -30,8 +30,7 @@ config :crawly,
   fetcher: {Crawly.Fetchers.Splash, [base_url: "http://localhost:8050/render.html"]},
   pipelines: [
     DataReeler.Pipelines.ProductDatabase,
-    Crawly.Pipelines.JSONEncoder,
-    {Crawly.Pipelines.WriteToFile, extension: "jl", folder: "/tmp/data_reeler"}
+    Crawly.Pipelines.JSONEncoder
   ]
 
 # ## SSL Support

@@ -72,10 +72,10 @@ defmodule DataReeler.Crawlers.Plovakplus do
       categories:
         posted_in
         |> Floki.find("a")
-        |> Stream.reject(&reject_uncategorized?/1)
-        |> Stream.map(&Floki.text/1)
-        |> Stream.map(&String.trim/1)
-        |> Stream.map(&String.downcase/1),
+        |> Enum.reject(&reject_uncategorized?/1)
+        |> Enum.map(&Floki.text/1)
+        |> Enum.map(&String.trim/1)
+        |> Enum.map(&String.downcase/1),
         
       sku:
         document
@@ -89,8 +89,8 @@ defmodule DataReeler.Crawlers.Plovakplus do
         |> Floki.find("#primary")
         |> Floki.find("div.description.woocommerce-product-details__short-description")
         |> Floki.find("p")
-        |> Stream.map(&Floki.text/1)
-        |> Stream.map(&String.trim/1),
+        |> Enum.map(&Floki.text/1)
+        |> Enum.map(&String.trim/1),
         
       price:
         document
@@ -98,9 +98,9 @@ defmodule DataReeler.Crawlers.Plovakplus do
         |> Floki.find("p.price")
         |> Floki.find("span.woocommerce-Price-amount.amount")
         |> Floki.find("bdi")
-        |> Stream.map(&Floki.text(&1, deep: false))
-        |> Stream.map(&String.trim/1)
-        |> Stream.map(&normalize_price/1),
+        |> Enum.map(&Floki.text(&1, deep: false))
+        |> Enum.map(&String.trim/1)
+        |> Enum.map(&normalize_price/1),
         
       images: 
         document
@@ -145,11 +145,11 @@ defmodule DataReeler.Crawlers.Plovakplus do
       |> Floki.attribute("href")
       
     related_categories
-    |> Stream.concat(related_product_urls)
-    |> Stream.concat(category_url)
-    |> Stream.uniq()
-    |> Stream.map(&build_absolute_url/1)
-    |> Stream.map(&Crawly.Utils.request_from_url/1)
+    |> Enum.concat(related_product_urls)
+    |> Enum.concat(category_url)
+    |> Enum.uniq()
+    |> Enum.map(&build_absolute_url/1)
+    |> Enum.map(&Crawly.Utils.request_from_url/1)
   end
   
   defp normalize_price(price) when is_bitstring(price) do
@@ -188,10 +188,10 @@ defmodule DataReeler.Crawlers.Plovakplus do
 
     requests =
       landing_page_products
-      |> Stream.concat(landing_page_categories)
-      |> Stream.uniq()
-      |> Stream.map(&build_absolute_url/1)
-      |> Stream.map(&Crawly.Utils.request_from_url/1)
+      |> Enum.concat(landing_page_categories)
+      |> Enum.uniq()
+      |> Enum.map(&build_absolute_url/1)
+      |> Enum.map(&Crawly.Utils.request_from_url/1)
       
     {[], requests}
   end
