@@ -147,6 +147,7 @@ defmodule DataReeler.Crawlers.Plovakplus do
         |> Floki.find("bdi")
         |> Enum.map(&Floki.text(&1, deep: false))
         |> Enum.map(&String.trim/1)
+        |> Enum.reverse()
         |> Enum.map(&normalize_price/1),
         
       images: 
