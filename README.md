@@ -23,14 +23,33 @@ Erlang/OTP 26 [erts-14.2.1] [source] [64-bit] [smp:8:8] [ds:8:8:10] [async-threa
 Elixir 1.16.0 (compiled with Erlang/OTP 24)
 ```
 
-### Splash
+### Browserless.io
 
-To be able to load dynamic JavaScript content [Splash](https://hub.docker.com/r/scrapinghub/splash/) needs to be used. Also for extra security `podman` is used instead of `docker`.
+To be able to load dynamic JavaScript content [browserless.io](
+) needs to be used. Also for extra security `podman` is used instead of `docker`.
 
 To start splash run the command:
 
 ```bash
-podman run --name splash -d -p 8050:8050 scrapinghub/splash 
+podman run -d -e CONCURRENT=8 -e PREBOOT_QUANTITY=8 --restart always -p 3000:3000 --name browserless browserless/chrome:latest
+```
+
+`CONCURRENT` is the amount of active connections. Generally 4 should be used per service, so just multiply the amount of services by 4 for this value.
+
+`PREBOOT_QUANTITY` should *probably* be the amount of active chrome browsers at any time, although it might not work because of bad documentation.
+
+### Elasticsearch
+
+As this application uses elasticsearch for the main logic for filtering through the products, it needs to be ran as a service. Due to a bug of implementation in the ES library, elasticsearch 8 can't be used. To run the correct version in a container, run this command:
+
+```bash
+podman run --restart always -d --name elasticsearch --memory 2048m -p 0.0.0.0:9200:9200 -p 9300:9300 -e "discovery.type=single-node" -e "xpack.security.enabled=false" docker.elastic.co/elasticsearch/elasticsearch:7.17.18
+```
+
+To index/sync products onto the ES server, you need to run this command:
+
+```bash
+mix elasticsearch.build products --cluster DataReeler.Elasticsearch.Cluster
 ```
 
 ## Starting the server

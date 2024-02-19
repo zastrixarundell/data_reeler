@@ -26,6 +26,7 @@ erl_crash.dump
 data_reeler-*.tar
 
 # Ignore the content of Crawly
-
 dets_simple_storage
 
+# asdf environment variables
+.asdf-vars
