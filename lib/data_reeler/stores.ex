@@ -21,6 +21,20 @@ defmodule DataReeler.Stores do
         update_product(existing, values)
     end
   end
+  
+  @doc """
+  Get random product URLs from the database for the given provider.
+  """
+  @spec random_store_seed_urls(provider :: binary(), limit :: integer()) :: [binary()]
+  def random_store_seed_urls(provider, limit \\ 100) do
+    Repo.all(
+      from p in Product,
+      where: p.provider == ^provider,
+      order_by: fragment("RANDOM()"),
+      limit: ^limit,
+      select: p.url
+    )
+  end
 
   @doc """
   Returns the list of products.

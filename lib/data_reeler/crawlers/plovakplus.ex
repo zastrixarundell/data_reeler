@@ -31,7 +31,9 @@ defmodule DataReeler.Crawlers.Plovakplus do
       ]
       |> Enum.reduce([], fn url, acc -> acc ++ generate_initial_list(url) end)
     
-    [ start_urls: urls ]
+    [
+      start_urls: urls ++ DataReeler.Stores.random_store_seed_urls("plovakplus")
+    ]
   end
   
   defp generate_initial_list(start_url) do
