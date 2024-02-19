@@ -1,0 +1,30 @@
+{
+  "mappings": {
+    "properties": {
+      "description": {
+        "type": "text"
+      },
+      "title": {
+        "type": "text"
+      },
+      "url": {
+        "type": "keyword"
+      },
+      "provider": {
+        "type": "keyword"
+      },
+      "sku": {
+        "type": "keyword"
+      },
+      "price": {
+        "type": "keyword"
+      },
+      "images": {
+        "type": "keyword"
+      },
+      "categories": {
+        "type": "keyword"
+      }
+    }
+  }
+}
