@@ -155,7 +155,7 @@ defmodule DataReeler.Crawlers.Plovakplus do
         |> Floki.attribute("src"),
         
       url: 
-        response.request.url,
+        response.request_url,
     
       provider:
         "plovakplus"
