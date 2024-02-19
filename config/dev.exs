@@ -27,6 +27,7 @@ config :data_reeler, DataReelerWeb.Endpoint,
   watchers: []
   
 config :crawly,
+  concurrent_requests_per_domain: 8,
   fetcher: {Crawly.Fetchers.Splash, [base_url: "http://localhost:8050/render.html"]},
   pipelines: [
     DataReeler.Pipelines.ProductDatabase,
