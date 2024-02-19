@@ -11,6 +11,7 @@ defmodule DataReeler.Application do
       DataReelerWeb.Telemetry,
       DataReeler.Repo,
       DataReeler.Servers.Plovakplus,
+      DataReeler.Servers.Formaxstore,
       DataReeler.Elasticsearch.Cluster,
       {DNSCluster, query: Application.get_env(:data_reeler, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: DataReeler.PubSub},
