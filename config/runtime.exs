@@ -24,7 +24,7 @@ concurrent_crawlers =
     """
 
 config :crawly,
-  concurrent_requests_per_domain: Integer.parse(concurrent_crawlers),
+  concurrent_requests_per_domain: String.to_integer(concurrent_crawlers),
   fetcher: {DataReeler.Fetchers.BrowserlessFetcher, [base_url: System.get_env("BROWSERLESS_URL")]},
   pipelines: [
     DataReeler.Pipelines.ProductDatabase,
