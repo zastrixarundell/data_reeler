@@ -28,7 +28,7 @@ config :data_reeler, DataReelerWeb.Endpoint,
   
 config :crawly,
   concurrent_requests_per_domain: 8,
-  fetcher: {Crawly.Fetchers.Splash, [base_url: "http://localhost:8050/render.html"]},
+  fetcher: {DataReeler.Fetchers.BrowserlessFetcher, [base_url: "http://localhost:3000/content?blockAds"]},
   pipelines: [
     DataReeler.Pipelines.ProductDatabase,
     Crawly.Pipelines.JSONEncoder
