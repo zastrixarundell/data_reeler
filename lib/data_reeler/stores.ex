@@ -17,7 +17,7 @@ defmodule DataReeler.Stores do
         create_product(values)
         
       existing ->
-        Logger.debug("Product with values: #{inspect(values)} already exists!", ansi_color: :yellow)
+        Logger.debug("Product with values: #{inspect(%{sku: values.sku, provider: values.provider, title: values.title})} already exists!", ansi_color: :yellow)
         update_product(existing, values)
     end
   end
