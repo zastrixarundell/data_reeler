@@ -21,20 +21,6 @@ defmodule DataReeler.Fetchers.BrowserlessFetcher do
       
     {timeout, _options} = Keyword.pop(options, :timeout, 50_000)
     
-    # metadata for browserless.io
-    
-    decoded_uri =
-      base_url
-      |> URI.decode()
-      |> URI.parse()
-      
-    cache_name = "--user-data-dir=/tmp/browserless-cache-#{decoded_uri.host}"
-    
-    rebuilt_url =
-      decoded_uri
-      |> URI.append_query(cache_name)
-      |> URI.to_string()
-    
     # http://localhost:3000/docs#tag/Browser-REST-APIs
     request = %{
       url: request.url,
@@ -45,7 +31,7 @@ defmodule DataReeler.Fetchers.BrowserlessFetcher do
     }
     
     with {:ok, body} <- Jason.encode(request),
-         {:ok, response = %{body: _body, status_code: 200}} <- HTTPoison.post(rebuilt_url, body, [{"Content-Type", "application/json"}], [recv_timeout: timeout]) do
+         {:ok, response = %{body: _body, status_code: 200}} <- HTTPoison.post(base_url, body, [{"Content-Type", "application/json"}], [recv_timeout: timeout]) do
       new_request = %HTTPoison.Request{response.request | url: request.url}
 
       {
