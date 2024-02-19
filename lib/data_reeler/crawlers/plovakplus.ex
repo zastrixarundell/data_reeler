@@ -8,9 +8,50 @@ defmodule DataReeler.Crawlers.Plovakplus do
   
   @impl Crawly.Spider
   def init() do
-    [
-      start_urls: ["https://www.plovakplus.rs/prodavnica/"]
-    ]
+    urls =
+      [
+        "https://www.plovakplus.rs/ribolovacka-oprema/stapovi-za-pecanje/",
+        "https://www.plovakplus.rs/ribolovacka-oprema/feeder-oprema/",
+        "https://www.plovakplus.rs/ribolovacka-oprema/najloni-za-pecanje/",
+        "https://www.plovakplus.rs/ribolovacka-oprema/torbe-futrole-rancevi/",
+        "https://www.plovakplus.rs/ribolovacka-oprema/hemija-primama-boile-peleti/",
+        "https://www.plovakplus.rs/ribolovacka-oprema/plasticne-kutije-kofe-i-sita/",
+        "https://www.plovakplus.rs/ribolovacka-oprema/masinice-za-pecanje/",
+        "https://www.plovakplus.rs/ribolovacka-oprema/saranska-oprema/",
+        "https://www.plovakplus.rs/ribolovacka-oprema/varalice/",
+        "https://www.plovakplus.rs/ribolovacka-oprema/cuvarke-za-ribolov/",
+        "https://www.plovakplus.rs/ribolovacka-oprema/kamp-oprema/",
+        "https://www.plovakplus.rs/ribolovacka-oprema/hranilice-olovne-glave-olova/",
+        "https://www.plovakplus.rs/ribolovacka-oprema/nautika/",
+        "https://www.plovakplus.rs/ribolovacka-oprema/rod-pod-signalizatori-i-swingeri/",
+        "https://www.plovakplus.rs/ribolovacka-oprema/udice/",
+        "https://www.plovakplus.rs/ribolovacka-oprema/meredovi/",
+        "https://www.plovakplus.rs/ribolovacka-oprema/garderoba/",
+        "https://www.plovakplus.rs/ribolovacka-oprema/sitan-pribor/"
+      ]
+      |> Enum.reduce([], fn url, acc -> acc ++ generate_initial_list(url) end)
+    
+    [ start_urls: urls ]
+  end
+  
+  defp generate_initial_list(start_url) do
+    Logger.debug("Starting URL checks for #{inspect(start_url)}")
+
+    with {:ok, %{body: body, status_code: 200}} <- HTTPoison.get(start_url),
+         {:ok, document} <- Floki.parse_document(body) do
+      output =
+        document
+        |> Floki.find(".product-category > a")
+        |> Floki.attribute("href")
+        
+      Logger.debug("Generated URLs: #{inspect(output)}")
+      
+      output
+    else
+      _ ->
+        Logger.warning("Failed to generate URLs for: #{inspect(start_url)}")
+        []
+    end
   end
 
   @impl Crawly.Spider
