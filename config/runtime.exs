@@ -20,7 +20,7 @@ import Config
 concurrent_crawlers =
   System.get_env("CONCURRENT_CRAWLERS") ||
     raise """
-    You need to specify the amount of concurrent crawlers per domain!
+    You need to specify CONCURRENT_CRAWLERS, the amount of concurrent crawlers per domain!
     """
 
 config :crawly,
@@ -31,10 +31,19 @@ config :crawly,
     Crawly.Pipelines.JSONEncoder
   ]
   
+server_backoff =
+  System.get_env("CHECK_BACKOFF_HOURS") ||
+    raise """
+    You need to specify CHECK_BACKOFF_HOURS, the amount of hours between checks for stores.
+    """
+  
+config :data_reeler,
+  server_backoff: String.to_integer(server_backoff)
+  
 elasticsearch_url =
   System.get_env("ELASTICSEARCH_URL") ||
     raise """
-    You need to specify and elasticsearch URL please.
+    You need to specify ELASTICSEARCH_URL, the elasticsearch URL.
     """
   
 config :data_reeler, DataReeler.Elasticsearch.Cluster,

@@ -18,7 +18,8 @@ defmodule DataReeler.Servers.Formaxstore do
   end
   
   def schedule_crawly do
-    Process.send_after(self(), :schedule, 24 * 60 * 60 * 1000)
+    hours = Application.get_env(:data_reeler, :server_backoff)
+    Process.send_after(self(), :schedule, hours * 60 * 60 * 1000)
   end
   
   @impl true
@@ -31,7 +32,7 @@ defmodule DataReeler.Servers.Formaxstore do
         Logger.debug("Formaxstore is still running.")
         
       {:error, :spider_not_running} ->
-         Crawly.Engine.start_spider(Formaxstore)  
+        Crawly.Engine.start_spider(Formaxstore)  
         Logger.debug("Restarting formaxstore.")
     end
     
