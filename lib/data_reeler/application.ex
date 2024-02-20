@@ -10,8 +10,6 @@ defmodule DataReeler.Application do
     children = [
       DataReelerWeb.Telemetry,
       DataReeler.Repo,
-      DataReeler.Servers.Plovakplus,
-      DataReeler.Servers.Formaxstore,
       DataReeler.Elasticsearch.Cluster,
       {DNSCluster, query: Application.get_env(:data_reeler, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: DataReeler.PubSub},
@@ -20,6 +18,16 @@ defmodule DataReeler.Application do
       # Start to serve requests, typically the last entry
       DataReelerWeb.Endpoint
     ]
+    
+    children =
+    if Application.get_env(:data_reeler, :decoupled_crawlers) == "false" do
+       children ++ [
+        DataReeler.Servers.Plovakplus,
+        DataReeler.Servers.Formaxstore
+      ]
+    else
+      children  
+    end
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options

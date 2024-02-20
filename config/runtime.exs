@@ -36,9 +36,16 @@ server_backoff =
     raise """
     You need to specify CHECK_BACKOFF_HOURS, the amount of hours between checks for stores.
     """
+    
+decoupled_crawlers =
+  System.get_env("DECOUPLED_CRAWLERS") ||
+    raise """
+    Please specify DECOUPLED_CRAWLERS (should the crawlers NOT run in the main thread).
+    """
   
 config :data_reeler,
-  server_backoff: String.to_integer(server_backoff)
+  server_backoff: String.to_integer(server_backoff),
+  decoupled_crawlers: decoupled_crawlers
   
 elasticsearch_url =
   System.get_env("ELASTICSEARCH_URL") ||

@@ -52,6 +52,14 @@ To index/sync products onto the ES server, you need to run this command:
 mix elasticsearch.build products --cluster DataReeler.Elasticsearch.Cluster
 ```
 
+### Starting the crawlers
+
+To start the crawlers, run this command:
+
+`mix data_reeler.crawlers`
+
+Or alternatively if `DECOUPLED_CRAWLERS` is set to `false`, it will run the crawlers with the application.
+
 ## Starting the server
 
   * Run `mix setup` to install and setup dependencies
