@@ -31,7 +31,7 @@ defmodule DataReeler.Fetchers.BrowserlessFetcher do
     }
     
     with {:ok, body} <- Jason.encode(request),
-         {:ok, response = %{body: _body, status_code: 200}} <- HTTPoison.post(base_url, body, [{"Content-Type", "application/json"}], [recv_timeout: timeout]) do
+         {:ok, response = %{body: _body, status_code: 200}} <- HTTPoison.post(base_url, body, [{"Content-Type", "application/json"}], [recv_timeout: timeout, follow_redirect: true]) do
       new_request = %HTTPoison.Request{response.request | url: request.url}
 
       {
