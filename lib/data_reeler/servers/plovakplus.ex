@@ -6,7 +6,7 @@ defmodule DataReeler.Servers.Plovakplus do
   require Logger
   
   def start_link(_) do
-    GenServer.start_link(__MODULE__, [])
+    GenServer.start_link(__MODULE__, [], name: :plovakplus_server)
   end
   
   @doc false
