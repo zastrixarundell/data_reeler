@@ -212,10 +212,14 @@ defmodule DataReeler.Crawlers.Formaxstore do
 
   defp build_pagination(page, response) do
     response.request_url
-    |> String.replace(~r/page-\d+\/?$/, "")
     |> URI.parse()
+    |> remove_uri_page()
     |> URI.append_path("/page-#{page}")
     |> URI.to_string()
+  end
+  
+  defp remove_uri_page(uri = %URI{path: path}) do
+    %URI{uri | path: String.replace(path, ~r/page-\d+\/?$/, "")}
   end
 
   def build_absolute_url(url), do: URI.merge(base_url(), url) |> to_string()
