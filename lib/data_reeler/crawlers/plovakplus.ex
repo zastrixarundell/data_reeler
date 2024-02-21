@@ -3,6 +3,14 @@ defmodule DataReeler.Crawlers.Plovakplus do
   
   require Logger
   
+  alias DataReeler.Fetchers.BrowserlessFetcher
+  
+  @impl Crawly.Spider
+  def override_settings() do
+    Application.get_all_env(:crawly)
+    |> Keyword.put(:fetcher, {BrowserlessFetcher, []})
+  end
+  
   @impl Crawly.Spider
   def base_url(), do: "https://www.plovakplus.rs/prodavnica/"
   

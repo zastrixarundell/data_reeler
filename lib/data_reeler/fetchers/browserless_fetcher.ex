@@ -5,19 +5,7 @@ defmodule DataReeler.Fetchers.BrowserlessFetcher do
   def fetch(request, options) do
     # configuration
     
-    {base_url, options} =
-      case Keyword.pop(options, :base_url) do
-        {nil, _} ->
-          throw(
-            "The base_url is not set. Browserlerss.io fetcher can't be used! " <>
-            "Please set :base_url in fetcher options to continue. " <>
-            "For example: " <>
-            "fetcher: {DataReeler.Fetchers.BrowserlessFetcher, [base_url: <url>]}"
-          )
-          
-        {base_url, other_options} ->
-          {base_url, other_options}
-      end
+    base_url = Application.get_env(:data_reeler, :browserless_fetcher)
       
     {timeout, _options} = Keyword.pop(options, :timeout, 50_000)
     

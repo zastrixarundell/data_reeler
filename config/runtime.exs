@@ -25,7 +25,6 @@ concurrent_crawlers =
 
 config :crawly,
   concurrent_requests_per_domain: String.to_integer(concurrent_crawlers),
-  fetcher: {DataReeler.Fetchers.BrowserlessFetcher, [base_url: System.get_env("BROWSERLESS_URL")]},
   pipelines: [
     DataReeler.Pipelines.ProductDatabase,
     Crawly.Pipelines.JSONEncoder
@@ -42,10 +41,18 @@ decoupled_crawlers =
     raise """
     Please specify DECOUPLED_CRAWLERS (should the crawlers NOT run in the main thread).
     """
+    
+browserless_fetcher =
+  System.get_env("BROWSERLESS_URL") ||
+    raise """
+    The BROWSERLESS_URL variable is not set. Browserlerss.io fetcher can't be used! Please set :base_url in fetcher options to continue.
+    For example: \"localhost:3000/content\""
+    """
   
 config :data_reeler,
   server_backoff: String.to_integer(server_backoff),
-  decoupled_crawlers: decoupled_crawlers
+  decoupled_crawlers: decoupled_crawlers,
+  browserless_fetcher: browserless_fetcher
   
 elasticsearch_url =
   System.get_env("ELASTICSEARCH_URL") ||
