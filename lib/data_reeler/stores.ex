@@ -10,7 +10,12 @@ defmodule DataReeler.Stores do
   alias DataReeler.Stores.Product
   
   def upsert_product_by_sku_and_provider(values) do
-    product = Repo.one(from(p in Product, where: p.sku == ^values.sku and p.provider == ^values.provider))
+    product =
+      Repo.one(
+        from p in Product,
+        where: p.sku == ^values.sku,
+        where: p.provider == ^values.provider
+      )
     
     case product do
       nil ->
