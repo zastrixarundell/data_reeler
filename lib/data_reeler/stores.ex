@@ -53,6 +53,13 @@ defmodule DataReeler.Stores do
   def list_products do
     Repo.all(Product)
   end
+  
+  @doc """
+  Return the stream of all products
+  """
+  def product_stream do
+    Repo.stream(Product)
+  end
 
   @doc """
   Gets a single product.
