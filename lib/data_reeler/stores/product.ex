@@ -23,6 +23,39 @@ defmodule DataReeler.Stores.Product do
     |> unique_constraint([:sku, :provider], name: :unique_sku_on_provider)
   end
   
+  def encode_xml(%__MODULE__{} = product) do
+    "<product>" <>
+      "<title>" <>
+        encode_xml_field(product.title) <>
+      "</title>" <>
+      "<description>" <>
+        encode_xml_field(Enum.join(product.description, ", ")) <>
+      "</description>" <>
+      "<url>" <> 
+        encode_xml_field(product.url) <>
+      "</url>" <>
+      "<provider>" <> 
+        encode_xml_field(product.provider) <>
+      "</provider>" <>
+      "<sku>" <> 
+        encode_xml_field(product.sku) <>
+      "</sku>" <>
+      "<price>" <>
+        encode_xml_field(Enum.join(Enum.map(product.price, &Float.to_string/1), ", ")) <>
+      "</price>" <>
+      "<images>" <>
+        encode_xml_field(Enum.join(product.images, ", ") )<>
+      "</images>" <>
+      "<categories>" <>
+        encode_xml_field(Enum.join(product.categories, ", ")) <>
+      "</categories>" <> 
+    "</product>"
+  end
+  
+  defp encode_xml_field(field) do
+    XMLRPC.Encode.escape_attr(field)
+  end
+  
   defimpl Elasticsearch.Document, for: DataReeler.Stores.Product do  
     @spec id(%DataReeler.Stores.Product{}) :: integer()
     def id(product), do: product.id
