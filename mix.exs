@@ -45,7 +45,8 @@ defmodule DataReeler.MixProject do
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.1.1"},
       {:bandit, ">= 0.0.0"},
-      {:elasticsearch, "~> 1.0.0"}
+      {:elasticsearch, "~> 1.0.0"},
+      {:xmlrpc, "~> 1.3"}
     ]
   end
 
