@@ -55,11 +55,22 @@ defmodule DataReeler.Stores do
   end
   
   @doc """
-  Return the stream of all products
+  Return the stream of all products for stores
   """
-  def product_stream do
+  def product_stream(store_name \\ nil)
+  
+  def product_stream(store_name) when is_binary(store_name) do
+    query =
+      from p in Product,
+        where: p.provider == ^store_name
+        
+    Repo.stream(query)
+  end
+  
+  def product_stream(nil) do
     Repo.stream(Product)
   end
+  
 
   @doc """
   Gets a single product.
