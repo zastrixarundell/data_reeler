@@ -176,6 +176,7 @@ defmodule DataReeler.Crawlers.Plovakplus do
         document
         |> Floki.find("#tab-pwb_tab-content")
         |> Floki.find("h3")
+        |> List.first()
         |> Floki.text()
         |> String.trim()
     }

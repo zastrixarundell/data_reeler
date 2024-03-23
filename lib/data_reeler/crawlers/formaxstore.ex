@@ -110,6 +110,7 @@ defmodule DataReeler.Crawlers.Formaxstore do
         document
         |> Floki.find(".heading-wrapper")
         |> Floki.find(".brand")
+        |> List.first()
         |> Floki.text()
         |> String.trim(),
 
