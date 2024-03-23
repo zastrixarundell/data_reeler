@@ -11,6 +11,8 @@ defmodule DataReeler.Stores.Product do
     field :price, {:array, :float}
     field :images, {:array, :string}
     field :categories, {:array, :string}
+    
+    belongs_to :brand, DataReeler.Stores.Brand
 
     timestamps(type: :utc_datetime)
   end
@@ -18,39 +20,53 @@ defmodule DataReeler.Stores.Product do
   @doc false
   def changeset(product, attrs) do
     product
-    |> cast(attrs, [:sku, :price, :images, :categories, :provider, :url, :title, :description])
-    |> validate_required([:sku, :price, :images, :categories, :provider, :url, :title, :description])
+    |> cast(attrs, [:sku, :price, :images, :categories, :provider, :url, :title, :description, :brand_id])
+    |> validate_required([:sku, :price, :images, :categories, :provider, :url, :title, :description, :brand_id])
     |> unique_constraint([:sku, :provider], name: :unique_sku_on_provider)
   end
   
   def encode_xml(%__MODULE__{} = product) do
     "<product>" <>
-      "<title>" <>
+      "<pid>" <>
+        "#{product.id}" <>
+      "</pid>" <>
+      "<name>" <>
         encode_xml_field(product.title) <>
-      "</title>" <>
+      "</name>" <>
       "<description>" <>
-        encode_xml_field(Enum.join(product.description, ", ")) <>
+        encode_xml_field(Enum.join(product.description, "\n")) <>
       "</description>" <>
       "<url>" <> 
         encode_xml_field(product.url) <>
       "</url>" <>
-      "<provider>" <> 
-        encode_xml_field(product.provider) <>
-      "</provider>" <>
-      "<sku>" <> 
-        encode_xml_field(product.sku) <>
-      "</sku>" <>
-      "<price>" <>
-        encode_xml_field(Enum.join(Enum.map(product.price, &Float.to_string/1), ", ")) <>
-      "</price>" <>
-      "<images>" <>
-        encode_xml_field(Enum.join(product.images, ", ") )<>
-      "</images>" <>
       "<categories>" <>
-        encode_xml_field(Enum.join(product.categories, ", ")) <>
-      "</categories>" <> 
+        encode_xml_field(Enum.join(capitalize_each_element(product.categories), ", ")) <>
+      "</categories>" <>
+      "<brand>" <>
+        encode_xml_field(product.brand.name) <>
+      "</brand>" <>
+      "<price>" <>
+        encode_xml_field(Enum.join(Enum.map(product.price, fn price -> :erlang.float_to_binary(price, decimals: 2) end), ", ")) <>
+      "</price>" <>
+      "<image>" <>
+        encode_xml_field(product.images |> List.first())<>
+      "</image>" <>
     "</product>"
   end
+  
+  defp capitalize_each_element(elements) when is_list(elements) do
+    elements
+    |> Enum.map(&capitalize_each_element/1)
+  end
+  
+  defp capitalize_each_element(element) when is_binary(element) do
+    element
+    |> String.split(" ")
+    |> Enum.map(&String.capitalize/1)
+    |> Enum.join(" ")
+  end
+  
+  defp capitalize_each_element(any), do: any
   
   defp encode_xml_field(field) do
     XMLRPC.Encode.escape_attr(field)

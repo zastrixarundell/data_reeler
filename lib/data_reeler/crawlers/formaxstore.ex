@@ -97,7 +97,7 @@ defmodule DataReeler.Crawlers.Formaxstore do
         |> Enum.map(&Floki.text/1)
         |> Enum.map(&String.split(&1,"\n"))
         |> List.flatten()
-        |> Enum.reject(&(&1==""))
+        |> Enum.reject(&blank?/1)
         |> Enum.map(&String.trim/1),
 
       url:
@@ -105,6 +105,13 @@ defmodule DataReeler.Crawlers.Formaxstore do
 
       provider:
         "formaxstore",
+        
+      brand_name:
+        document
+        |> Floki.find(".heading-wrapper")
+        |> Floki.find(".brand")
+        |> Floki.text()
+        |> String.trim(),
 
       images:
         document
@@ -136,6 +143,10 @@ defmodule DataReeler.Crawlers.Formaxstore do
       )
     }
   end
+  
+  defp blank?(nil), do: true
+  defp blank?(""), do: true
+  defp blank?(_), do: false
 
   defp normalize_price(price) when is_bitstring(price) do
     price

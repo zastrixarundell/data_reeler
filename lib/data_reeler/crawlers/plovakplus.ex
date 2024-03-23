@@ -126,6 +126,7 @@ defmodule DataReeler.Crawlers.Plovakplus do
         |> Enum.reject(&reject_uncategorized?/1)
         |> Enum.map(&Floki.text/1)
         |> Enum.map(&String.trim/1)
+        |> Enum.reject(&blank?/1)
         |> Enum.map(&String.downcase/1),
         
       sku:
@@ -169,9 +170,20 @@ defmodule DataReeler.Crawlers.Plovakplus do
         response.request_url,
     
       provider:
-        "plovakplus"
+        "plovakplus",
+        
+      brand_name:
+        document
+        |> Floki.find("#tab-pwb_tab-content")
+        |> Floki.find("h3")
+        |> Floki.text()
+        |> String.trim()
     }
   end
+  
+  defp blank?(nil), do: true
+  defp blank?(""), do: true
+  defp blank?(_), do: false
   
   defp item_urls!(document) do
     posted_in =

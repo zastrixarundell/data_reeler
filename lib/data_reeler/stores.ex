@@ -16,14 +16,23 @@ defmodule DataReeler.Stores do
         where: p.sku == ^values.sku,
         where: p.provider == ^values.provider
       )
+      
+    {brand_name, values} = Map.pop(values, :brand_name)
     
-    case product do
-      nil ->
-        create_product(values)
+    with {:ok, brand} <- find_or_create_brand_by_name(brand_name) do
+      values = Map.put(values, :brand_id, brand.id)
         
-      existing ->
-        Logger.debug("Product with values: #{inspect(%{sku: values.sku, provider: values.provider, title: values.title})} already exists!", ansi_color: :yellow)
-        update_product(existing, values)
+      case product do
+        nil ->
+          create_product(values)
+          
+        existing ->
+          Logger.debug("Product with values: #{inspect(%{sku: values.sku, provider: values.provider, title: values.title})} already exists!", ansi_color: :yellow)
+          update_product(existing, values)
+      end
+    else
+      error_message ->
+        error_message
     end
   end
   
@@ -62,15 +71,21 @@ defmodule DataReeler.Stores do
   def product_stream(store_name) when is_binary(store_name) do
     query =
       from p in Product,
-        where: p.provider == ^store_name
+        where: p.provider == ^store_name,
+        join: brand in assoc(p, :brand),
+        select: %Product{p | brand: brand, brand_id: brand.id}
         
     Repo.stream(query)
   end
   
   def product_stream(nil) do
-    Repo.stream(Product)
+    query =
+      from p in Product,
+        join: brand in assoc(p, :brand),
+        select: %Product{p | brand: brand, brand_id: brand.id}
+        
+    Repo.stream(query)
   end
-  
 
   @doc """
   Gets a single product.
@@ -151,5 +166,101 @@ defmodule DataReeler.Stores do
   """
   def change_product(%Product{} = product, attrs \\ %{}) do
     Product.changeset(product, attrs)
+  end
+
+  alias DataReeler.Stores.Brand
+
+  @doc """
+  Returns the list of brands.
+
+  ## Examples
+
+      iex> list_brands()
+      [%Brand{}, ...]
+
+  """
+  def list_brands do
+    Repo.all(Brand)
+  end
+  
+  def find_or_create_brand_by_name(name) do
+    case get_brand_by_name(name) do
+      nil ->
+        create_brand(%{name: name})
+        
+      existing ->
+        Logger.debug("Brand with name: #{existing.name} found!")
+        {:ok, existing}
+    end
+  end
+
+  @doc """
+  Gets a single brand.
+
+  Raises `Ecto.NoResultsError` if the Brand does not exist.
+
+  ## Examples
+
+      iex> get_brand_by_name("steg")
+      {:ok, %Brand{name: "steg"}}
+
+      iex> get_brand_by_name("steg123")
+      {:error, nil}
+
+  """
+  def get_brand_by_name(name) do
+    Repo.one(
+      from b in Brand,
+        where: fragment("LOWER(?) LIKE LOWER(?)", b.name, ^name)
+    )
+  end
+
+  @doc """
+  Creates a brand.
+
+  ## Examples
+
+      iex> create_brand(%{field: value})
+      {:ok, %Brand{}}
+
+      iex> create_brand(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_brand(attrs \\ %{}) do
+    Logger.debug("Creating brand with name: #{attrs.name}.")
+    
+    %Brand{}
+    |> Brand.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Deletes a brand.
+
+  ## Examples
+
+      iex> delete_brand(brand)
+      {:ok, %Brand{}}
+
+      iex> delete_brand(brand)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_brand(%Brand{} = brand) do
+    Repo.delete(brand)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking brand changes.
+
+  ## Examples
+
+      iex> change_brand(brand)
+      %Ecto.Changeset{data: %Brand{}}
+
+  """
+  def change_brand(%Brand{} = brand, attrs \\ %{}) do
+    Brand.changeset(brand, attrs)
   end
 end

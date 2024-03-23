@@ -24,4 +24,18 @@ defmodule DataReeler.StoresFixtures do
 
     product
   end
+
+  @doc """
+  Generate a brand.
+  """
+  def brand_fixture(attrs \\ %{}) do
+    {:ok, brand} =
+      attrs
+      |> Enum.into(%{
+        name: "some name"
+      })
+      |> DataReeler.Stores.create_brand()
+
+    brand
+  end
 end
