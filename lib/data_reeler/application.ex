@@ -20,19 +20,24 @@ defmodule DataReeler.Application do
     ]
     
     children =
-    if Application.get_env(:data_reeler, :decoupled_crawlers) == "false" do
-       children ++ [
-        DataReeler.Servers.Plovakplus,
-        DataReeler.Servers.Formaxstore
-      ]
-    else
-      children  
-    end
+      if should_start_crawlers?() do
+        children ++ [
+          DataReeler.Servers.Plovakplus,
+          DataReeler.Servers.Formaxstore,
+          DataReeler.Servers.Topfish
+        ]
+      else
+        children  
+      end
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: DataReeler.Supervisor]
     Supervisor.start_link(children, opts)
+  end
+  
+  defp should_start_crawlers?() do
+    Application.get_env(:data_reeler, :called_in_task) == true or Application.get_env(:data_reeler, :decoupled_crawlers) == "false"
   end
 
   # Tell Phoenix to update the endpoint configuration

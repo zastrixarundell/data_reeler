@@ -1,27 +1,20 @@
 defmodule Mix.Tasks.DataReeler.Crawlers do
   use Mix.Task
   
-  @requirements ["app.start"]
-  
   @shortdoc """
   Start the crawlers!
   """
   def run(_args) do
-    children = [
-      DataReeler.Servers.Plovakplus,
-      DataReeler.Servers.Formaxstore,
-      DataReeler.Servers.Topfish
-    ]
+    Application.put_env(:data_reeler, :called_in_task, true, persistent: true)
     
-    opts = [strategy: :one_for_one, name: DataReeler.CrawlerSupervisor]
-    Supervisor.start_link(children, opts)
-    
-    loop()
+    Mix.Tasks.Run.run(run_args())
   end
   
-  defp loop do
-    Process.sleep(1000)
-    
-    loop()
+  defp run_args do
+    if iex_running?(), do: [], else: ["--no-halt"]
+  end
+  
+  defp iex_running? do
+    Code.ensure_loaded?(IEx) and IEx.started?()
   end
 end
