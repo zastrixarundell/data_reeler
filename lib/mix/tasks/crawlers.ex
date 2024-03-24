@@ -9,7 +9,8 @@ defmodule Mix.Tasks.DataReeler.Crawlers do
   def run(_args) do
     children = [
       DataReeler.Servers.Plovakplus,
-      DataReeler.Servers.Formaxstore
+      DataReeler.Servers.Formaxstore,
+      DataReeler.Servers.Topfish
     ]
     
     opts = [strategy: :one_for_one, name: DataReeler.CrawlerSupervisor]
