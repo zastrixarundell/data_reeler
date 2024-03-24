@@ -1,7 +1,7 @@
-defmodule DataReeler.Repo.Migrations.ChangeisbnToIsbn do
+defmodule DataReeler.Repo.Migrations.ChangeSkuToIsbn do
   use Ecto.Migration
 
   def change do
-    rename table(:products), :isbn, to: :isbn
+    rename table(:products), :sku, to: :isbn
   end
 end
