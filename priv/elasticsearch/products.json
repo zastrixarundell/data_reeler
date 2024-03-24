@@ -13,7 +13,7 @@
       "provider": {
         "type": "keyword"
       },
-      "isbn": {
+      "sku": {
         "type": "keyword"
       },
       "price": {

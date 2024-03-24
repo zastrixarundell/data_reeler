@@ -83,9 +83,9 @@ defmodule DataReeler.Crawlers.Formaxstore do
         |> Enum.reject(&blank?/1)
         |> Enum.map(&String.trim/1),
 
-      isbn:
+      sku:
         document
-        |> Floki.find(".product-details-info > .code > .code:fl-contains(\"Isbn\") > span")
+        |> Floki.find(".product-details-info > .code > span")
         |> Floki.text(),
 
       categories:

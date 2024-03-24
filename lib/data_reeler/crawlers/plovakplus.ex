@@ -149,10 +149,10 @@ defmodule DataReeler.Crawlers.Plovakplus do
         |> Enum.reject(&blank?/1)
         |> Enum.map(&String.downcase/1),
 
-      isbn:
+      sku:
         document
         |> Floki.find("#primary")
-        |> Floki.find("span.isbn")
+        |> Floki.find("span.sku")
         |> Floki.text()
         |> String.trim(),
 

@@ -7,7 +7,7 @@ defmodule DataReeler.Stores.Product do
     field :title, :string
     field :url, :string
     field :provider, :string
-    field :isbn, :string
+    field :sku, :string
     field :price, {:array, :float}
     field :images, {:array, :string}
     field :categories, {:array, :string}
@@ -20,15 +20,15 @@ defmodule DataReeler.Stores.Product do
   @doc false
   def changeset(product, attrs) do
     product
-    |> cast(attrs, [:isbn, :price, :images, :categories, :provider, :url, :title, :description, :brand_id])
-    |> validate_required([:isbn, :price, :images, :categories, :provider, :url, :title, :description, :brand_id])
-    |> unique_constraint([:isbn, :provider], name: :unique_isbn_on_provider)
+    |> cast(attrs, [:sku, :price, :images, :categories, :provider, :url, :title, :description, :brand_id])
+    |> validate_required([:sku, :price, :images, :categories, :provider, :url, :title, :description, :brand_id])
+    |> unique_constraint([:sku, :provider], name: :unique_sku_on_provider)
   end
 
   def encode_xml(%__MODULE__{} = product) do
     "<product>" <>
       "<pid>" <>
-        encode_xml_field(product.isbn) <>
+        encode_xml_field(product.sku) <>
       "</pid>" <>
       "<name>" <>
         encode_xml_field(product.title) <>
@@ -85,7 +85,7 @@ defmodule DataReeler.Stores.Product do
         description: product.description,
         url: product.url,
         provider: product.provider,
-        isbn: product.isbn,
+        sku: product.sku,
         price: product.price,
         images: product.images,
         categories: product.categories

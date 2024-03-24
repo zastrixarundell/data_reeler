@@ -9,11 +9,11 @@ defmodule DataReeler.Stores do
 
   alias DataReeler.Stores.Product
 
-  def upsert_product_by_isbn_and_provider(values) do
+  def upsert_product_by_sku_and_provider(values) do
     product =
       Repo.one(
         from p in Product,
-        where: p.isbn == ^values.isbn,
+        where: p.sku == ^values.sku,
         where: p.provider == ^values.provider
       )
 
@@ -27,7 +27,7 @@ defmodule DataReeler.Stores do
           create_product(values)
 
         existing ->
-          Logger.debug("Product with values: #{inspect(%{isbn: values.isbn, provider: values.provider, title: values.title})} already exists!", ansi_color: :yellow)
+          Logger.debug("Product with values: #{inspect(%{sku: values.sku, provider: values.provider, title: values.title})} already exists!", ansi_color: :yellow)
           update_product(existing, values)
       end
     else

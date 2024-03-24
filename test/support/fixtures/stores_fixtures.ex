@@ -16,7 +16,7 @@ defmodule DataReeler.StoresFixtures do
         images: ["option1", "option2"],
         price: [],
         provider: "some provider",
-        isbn: "some isbn",
+        sku: "some sku",
         title: "some title",
         url: "some url"
       })
