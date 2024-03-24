@@ -28,7 +28,7 @@ defmodule DataReeler.Stores.Product do
   def encode_xml(%__MODULE__{} = product) do
     "<product>" <>
       "<pid>" <>
-        "#{product.id}" <>
+        "#{product.isbn}" <>
       "</pid>" <>
       "<name>" <>
         encode_xml_field(product.title) <>
