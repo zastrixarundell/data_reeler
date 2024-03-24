@@ -163,8 +163,8 @@ defmodule DataReeler.Crawlers.Plovakplus do
         |> Enum.map(&Floki.text/1)
         |> Enum.map(&String.split(&1,"\n"))
         |> List.flatten()
-        |> Enum.reject(&blank?/1)
-        |> Enum.map(&String.trim/1),
+        |> Enum.map(&String.trim/1)
+        |> Enum.reject(&blank?/1),
 
       price:
         document

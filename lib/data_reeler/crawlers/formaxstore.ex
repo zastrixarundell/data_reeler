@@ -78,9 +78,8 @@ defmodule DataReeler.Crawlers.Formaxstore do
         |> Enum.map(&Floki.text/1)
         |> Enum.map(&String.split(&1,"\n"))
         |> List.flatten()
-        |> Enum.reject(&blank?/1)
-        |> Enum.map(&String.trim/1),
-
+        |> Enum.map(&String.trim/1)
+        |> Enum.reject(&blank?/1),
       sku:
         document
         |> Floki.find(".product-details-info > .code > span")
@@ -95,8 +94,8 @@ defmodule DataReeler.Crawlers.Formaxstore do
         |> Enum.map(&Floki.text/1)
         |> Enum.map(&String.split(&1,"\n"))
         |> List.flatten()
-        |> Enum.reject(&blank?/1)
-        |> Enum.map(&String.trim/1),
+        |> Enum.map(&String.trim/1)
+        |> Enum.reject(&blank?/1),
 
       url:
         response.request_url,
