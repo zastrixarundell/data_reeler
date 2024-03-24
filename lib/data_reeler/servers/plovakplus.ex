@@ -63,7 +63,6 @@ defmodule DataReeler.Servers.Plovakplus do
   def handle_cast({:notify_broken, path, page}, %{broken: broken} = state) do
     Logger.debug("Notifying of broken URL on Plovakplus: #{path} :: #{page}")
     {:noreply, add_or_update_minimum_broken(state, broken, path, page)}
-    |> IO.inspect()
   end
   
   @doc false
