@@ -3,7 +3,7 @@ defmodule DataReeler.Repo.Migrations.CreateProducts do
 
   def change do
     create table(:products) do
-      add :isbn, :string
+      add :sku, :string
       add :price, {:array, :float}
       add :images, {:array, :string}
       add :categories, {:array, :string}
