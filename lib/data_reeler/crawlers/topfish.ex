@@ -19,7 +19,7 @@ defmodule DataReeler.Crawlers.Topfish do
       end
 
     [
-      start_urls: values ++ DataReeler.Stores.random_store_seed_urls("topfish")
+      start_urls: values
     ]
   end
 
@@ -173,7 +173,8 @@ defmodule DataReeler.Crawlers.Topfish do
     |> URI.parse()
     |> Map.get(:query)
     |> URI.decode_query()
-    |> Map.get("page", 0)
+    |> Map.get("page", "0")
+    |> String.to_integer()
   end
 
   defp build_page_numbers(max_page) when is_integer(max_page) do
@@ -192,7 +193,7 @@ defmodule DataReeler.Crawlers.Topfish do
   end
 
   defp remove_uri_page(uri = %URI{query: query}) do
-    %URI{uri | query: String.replace(query, ~r/&?page=\d+/, "")}
+    %URI{uri | query: String.replace(query || "", ~r/&?page=\d+/, "")}
   end
 
   def build_absolute_url(url), do: URI.merge(base_url(), url) |> to_string()
