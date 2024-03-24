@@ -1,7 +1,5 @@
 defmodule DataReeler.Crawlers.Plovakplus do
-  use Crawly.Spider
-
-  require Logger
+  use DataReeler.Crawler
 
   alias DataReeler.Servers.Plovakplus, as: Server
 

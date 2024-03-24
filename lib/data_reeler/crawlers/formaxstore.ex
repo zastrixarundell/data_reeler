@@ -1,7 +1,5 @@
 defmodule DataReeler.Crawlers.Formaxstore do
-  use Crawly.Spider
-
-  require Logger
+  use DataReeler.Crawler
 
   @impl Crawly.Spider
   def base_url(), do: "https://www.formaxstore.com/"
@@ -144,10 +142,6 @@ defmodule DataReeler.Crawlers.Formaxstore do
       )
     }
   end
-
-  defp blank?(nil), do: true
-  defp blank?(""), do: true
-  defp blank?(_), do: false
 
   defp normalize_price(price) when is_bitstring(price) do
     price
