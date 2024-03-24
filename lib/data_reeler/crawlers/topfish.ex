@@ -107,13 +107,8 @@ defmodule DataReeler.Crawlers.Topfish do
         |> String.trim(),
 
       price: (
-        prices_holder =
-          document
-          |> Floki.find(".product-information-wrapper")
-          |> Floki.find(".product-details-price")
-
         price_no_discount =
-          prices_holder
+          document
           |> Floki.find(".commerce-product-variation-default-full__list-price-item")
 
         price =
