@@ -28,7 +28,7 @@ defmodule DataReeler.Stores.Product do
   def encode_xml(%__MODULE__{} = product) do
     "<product>" <>
       "<pid>" <>
-        "#{product.isbn}" <>
+        encode_xml_field(product.isbn) <>
       "</pid>" <>
       "<name>" <>
         encode_xml_field(product.title) <>
@@ -69,7 +69,7 @@ defmodule DataReeler.Stores.Product do
   defp capitalize_each_element(any), do: any
 
   defp encode_xml_field(field) do
-    XMLRPC.Encode.escape_attr(field)
+    XMLRPC.Encode.escape_attr("#{field}")
   end
 
   defimpl Elasticsearch.Document, for: DataReeler.Stores.Product do
