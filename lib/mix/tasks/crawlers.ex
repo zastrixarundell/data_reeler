@@ -8,8 +8,8 @@ defmodule Mix.Tasks.DataReeler.Crawlers do
   """
   def run(_args) do
     children = [
-      DataReeler.Servers.Plovakplus,
-      DataReeler.Servers.Formaxstore,
+      # DataReeler.Servers.Plovakplus,
+      # DataReeler.Servers.Formaxstore,
       DataReeler.Servers.Topfish
     ]
     

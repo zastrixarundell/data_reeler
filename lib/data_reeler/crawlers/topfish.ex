@@ -79,7 +79,7 @@ defmodule DataReeler.Crawlers.Topfish do
 
       images:
         document
-        |> Floki.find(".product-image-wrapper")
+        |> Floki.find(".gallery-top")
         |> Floki.find("img")
         |> Floki.attribute("src")
         |> Enum.map(fn path -> build_absolute_url(path) end),
