@@ -83,7 +83,7 @@ defmodule DataReeler.Crawlers.Formaxstore do
         |> Enum.reject(&blank?/1)
         |> Enum.map(&String.trim/1),
 
-      sku:
+      isbn:
         document
         |> Floki.find(".product-details-info > .code > span")
         |> Floki.text(),
@@ -105,7 +105,7 @@ defmodule DataReeler.Crawlers.Formaxstore do
 
       provider:
         "formaxstore",
-        
+
       brand_name:
         document
         |> Floki.find(".heading-wrapper")
@@ -144,7 +144,7 @@ defmodule DataReeler.Crawlers.Formaxstore do
       )
     }
   end
-  
+
   defp blank?(nil), do: true
   defp blank?(""), do: true
   defp blank?(_), do: false
@@ -210,16 +210,16 @@ defmodule DataReeler.Crawlers.Formaxstore do
 
     {[], requests}
   end
-  
+
   defp safe_max([]), do: nil
-  
+
   defp safe_max(value), do: Enum.max(value)
 
   defp build_page_numbers(max_page) when is_integer(max_page) do
     1..max_page
     |> Enum.to_list()
   end
-  
+
   defp build_page_numbers(_), do: []
 
   defp build_pagination(page, response) do
@@ -229,7 +229,7 @@ defmodule DataReeler.Crawlers.Formaxstore do
     |> URI.append_path("/page-#{page}")
     |> URI.to_string()
   end
-  
+
   defp remove_uri_page(uri = %URI{path: path}) do
     %URI{uri | path: String.replace(path, ~r/page-\d+\/?$/, "")}
   end

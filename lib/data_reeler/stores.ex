@@ -8,26 +8,26 @@ defmodule DataReeler.Stores do
   alias DataReeler.Repo
 
   alias DataReeler.Stores.Product
-  
-  def upsert_product_by_sku_and_provider(values) do
+
+  def upsert_product_by_isbn_and_provider(values) do
     product =
       Repo.one(
         from p in Product,
-        where: p.sku == ^values.sku,
+        where: p.isbn == ^values.isbn,
         where: p.provider == ^values.provider
       )
-      
+
     {brand_name, values} = Map.pop(values, :brand_name)
-    
+
     with {:ok, brand} <- find_or_create_brand_by_name(brand_name) do
       values = Map.put(values, :brand_id, brand.id)
-        
+
       case product do
         nil ->
           create_product(values)
-          
+
         existing ->
-          Logger.debug("Product with values: #{inspect(%{sku: values.sku, provider: values.provider, title: values.title})} already exists!", ansi_color: :yellow)
+          Logger.debug("Product with values: #{inspect(%{isbn: values.isbn, provider: values.provider, title: values.title})} already exists!", ansi_color: :yellow)
           update_product(existing, values)
       end
     else
@@ -35,7 +35,7 @@ defmodule DataReeler.Stores do
         error_message
     end
   end
-  
+
   @doc """
   Get random product URLs from the database for the given provider.
   """
@@ -62,28 +62,28 @@ defmodule DataReeler.Stores do
   def list_products do
     Repo.all(Product)
   end
-  
+
   @doc """
   Return the stream of all products for stores
   """
   def product_stream(store_name \\ nil)
-  
+
   def product_stream(store_name) when is_binary(store_name) do
     query =
       from p in Product,
         where: p.provider == ^store_name,
         join: brand in assoc(p, :brand),
         select: %Product{p | brand: brand, brand_id: brand.id}
-        
+
     Repo.stream(query)
   end
-  
+
   def product_stream(nil) do
     query =
       from p in Product,
         join: brand in assoc(p, :brand),
         select: %Product{p | brand: brand, brand_id: brand.id}
-        
+
     Repo.stream(query)
   end
 
@@ -182,12 +182,12 @@ defmodule DataReeler.Stores do
   def list_brands do
     Repo.all(Brand)
   end
-  
+
   def find_or_create_brand_by_name(name) do
     case get_brand_by_name(name) do
       nil ->
         create_brand(%{name: name})
-        
+
       existing ->
         Logger.debug("Brand with name: #{existing.name} found!")
         {:ok, existing}
@@ -229,7 +229,7 @@ defmodule DataReeler.Stores do
   """
   def create_brand(attrs \\ %{}) do
     Logger.debug("Creating brand with name: #{attrs.name}.")
-    
+
     %Brand{}
     |> Brand.changeset(attrs)
     |> Repo.insert()
