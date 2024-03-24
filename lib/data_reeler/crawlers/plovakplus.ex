@@ -3,13 +3,13 @@ defmodule DataReeler.Crawlers.Plovakplus do
 
   require Logger
 
-  alias DataReeler.Fetchers.BrowserlessFetcher
+  alias DataReeler.Servers.Plovakplus, as: Server
 
-  @impl Crawly.Spider
-  def override_settings() do
-    Application.get_all_env(:crawly)
-    |> Keyword.put(:fetcher, {BrowserlessFetcher, []})
-  end
+  # @impl Crawly.Spider
+  # def override_settings() do
+  #   Application.get_all_env(:crawly)
+  #   |> Keyword.put(:fetcher, {BrowserlessFetcher, []})
+  # end
 
   @impl Crawly.Spider
   def base_url(), do: "https://www.plovakplus.rs/prodavnica/"
@@ -65,6 +65,26 @@ defmodule DataReeler.Crawlers.Plovakplus do
   end
 
   @impl Crawly.Spider
+  def parse_item(%HTTPoison.Response{status_code: 404, request_url: url}) do
+    with %URI{path: path} <- URI.parse(url),
+         true <- Regex.match?(~r/page\/\d+\/?$/, path) do
+      page_value =
+        Regex.run(~r/(\d+)\/?$/, path)
+        |> List.last()
+        |> String.to_integer()
+
+      non_numbered_path = String.replace(path, ~r/page\/\d+\/?$/, "")
+
+      Server.notify_broken(non_numbered_path, page_value)
+
+      %Crawly.ParsedItem{items: [], requests: []}
+    else
+      _ ->
+        %Crawly.ParsedItem{items: [], requests: []}
+    end
+  end
+
+  @impl Crawly.Spider
   def parse_item(response) do
     {:ok, document} = Floki.parse_document(response.body)
 
@@ -75,7 +95,7 @@ defmodule DataReeler.Crawlers.Plovakplus do
           acquire_product_page_data(response, document)
         :landing ->
           Logger.debug("Entered landing page for `plovakplus` on URL: #{inspect(response.request_url)}")
-          acquire_landing_page_data(document)
+          acquire_landing_page_data(response, document)
       end
 
     %Crawly.ParsedItem{items: items, requests: requests |> Enum.to_list()}
@@ -241,9 +261,9 @@ defmodule DataReeler.Crawlers.Plovakplus do
   # Scrape the landing page for potential request URLs. This doesn't add new
   # products as they don't have all of the information here, although it's
   # good to get stuff en-masse.
-  @spec acquire_landing_page_data(document :: Floki.html_tree())
+  @spec acquire_landing_page_data(response :: HTTPoison.Response.t(), document :: Floki.html_tree())
     :: {items :: [], requests :: Enumerable.t(Crawly.Request.t())}
-  defp acquire_landing_page_data(document) do
+  defp acquire_landing_page_data(response, document) do
     landing_page_products =
       document
       |> Floki.find("a.product-loop-title")
@@ -255,14 +275,50 @@ defmodule DataReeler.Crawlers.Plovakplus do
       |> Floki.find("a[rel=tag]")
       |> Floki.attribute("href")
 
+    req_with_page =
+      response.request_url
+      |> URI.parse()
+      |> increment_request_url()
+
     requests =
       landing_page_products
       |> Enum.concat(landing_page_categories)
+      |> Enum.concat(req_with_page)
       |> Enum.uniq()
       |> Enum.map(&build_absolute_url/1)
       |> Enum.map(&Crawly.Utils.request_from_url/1)
 
     {[], requests}
+  end
+
+  defp increment_request_url(%URI{path: path} = uri) do
+    non_numbered_path = String.replace(path, ~r/page\/\d+\/?$/, "")
+    new_number = fetch_page_number(path) + 1
+
+    if Server.should_try_page?(non_numbered_path, new_number) do
+      %URI{uri | path: non_numbered_path}
+      |> URI.append_path("/page")
+      |> URI.append_path("/#{new_number}")
+      |> add_trailing_slash()
+      |> URI.to_string()
+      |> List.wrap()
+    else
+      []
+    end
+  end
+
+  defp add_trailing_slash(%URI{path: path} = uri) do
+    %URI{uri | path: "#{path}/"}
+  end
+
+  defp fetch_page_number(path) do
+    if Regex.match?(~r/page\/\d+\/?$/, path) do
+      Regex.run(~r/(\d+)\/?$/, path)
+      |> List.last()
+      |> String.to_integer()
+    else
+      1
+    end
   end
 
   defp build_absolute_url(url), do: URI.merge(base_url(), url) |> to_string()
