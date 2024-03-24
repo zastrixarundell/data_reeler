@@ -200,10 +200,6 @@ defmodule DataReeler.Crawlers.Plovakplus do
     }
   end
 
-  defp blank?(nil), do: true
-  defp blank?(""), do: true
-  defp blank?(_), do: false
-
   defp item_urls!(document) do
     posted_in =
       document
