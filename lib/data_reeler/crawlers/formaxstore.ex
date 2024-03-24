@@ -85,7 +85,7 @@ defmodule DataReeler.Crawlers.Formaxstore do
 
       isbn:
         document
-        |> Floki.find(".product-details-info > .code > span")
+        |> Floki.find(".product-details-info > .code > .code:fl-contains(\"Isbn\") > span")
         |> Floki.text(),
 
       categories:
