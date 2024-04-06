@@ -84,18 +84,27 @@ defmodule DataReeler.Crawlers.Formaxstore do
         document
         |> Floki.find(".product-details-info > .code > span")
         |> Floki.text(),
-
+        
       categories:
+        document
+        |> Floki.find(".block.breadcrumbs li:not(.active)")
+        |> Enum.drop(2)
+        |> Enum.map(&Floki.text/1)
+        |> Enum.map(&String.trim/1)
+        |> Enum.reject(&blank?/1)
+        |> capitalize_first_element(),
+      
+      tags:
         document
         |> Floki.find("table.product-attrbite-table")
         |> Floki.find("tbody")
         |> Floki.find("tr:not(.attr-brend)")
         |> Floki.find("td > a")
         |> Enum.map(&Floki.text/1)
-        |> Enum.map(&String.split(&1,"\n"))
         |> List.flatten()
         |> Enum.map(&String.trim/1)
-        |> Enum.reject(&blank?/1),
+        |> Enum.reject(&blank?/1)
+        |> Enum.map(&String.downcase/1),
 
       url:
         response.request_url,
@@ -140,6 +149,24 @@ defmodule DataReeler.Crawlers.Formaxstore do
         |> Enum.uniq()
       )
     }
+  end
+  
+  defp capitalize_first_element(array) when is_list(array) do
+    with elements when elements > 1 <- Enum.count(array) do
+      [head | tail] = array
+      
+      [String.capitalize(head)] ++ tail
+    else
+      _ ->
+        if Enum.count(array) == 1 do
+          array 
+          |> List.first()
+          |> String.capitalize()
+          |> List.wrap()
+        else
+          array
+        end
+    end
   end
 
   defp normalize_price(price) when is_bitstring(price) do
