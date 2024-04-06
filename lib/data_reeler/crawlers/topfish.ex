@@ -99,11 +99,11 @@ defmodule DataReeler.Crawlers.Topfish do
         document
         |> Floki.find(".commerce-product-default-full__field-category-item > a")
         |> Enum.map(&Floki.text/1)
-        |> Enum.map(&String.downcase/1)
         |> Enum.map(&String.split(&1,"\n"))
         |> List.flatten()
         |> Enum.map(&String.trim/1)
-        |> Enum.reject(&blank?/1),
+        |> Enum.reject(&blank?/1)
+        |> Enum.map(&String.downcase/1),
 
       url:
         response.request_url,

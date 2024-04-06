@@ -137,14 +137,23 @@ defmodule DataReeler.Crawlers.Plovakplus do
         |> Floki.find("h2.product_title.entry-title.show-product-nav")
         |> Floki.text()
         |> String.trim(),
-
+        
       categories:
-        posted_in
-        |> Floki.find("a")
-        |> Enum.reject(&reject_uncategorized?/1)
+        document
+        |> Floki.find("ul.breadcrumb > li a[itemprop=item]")
+        |> Enum.drop(2)
         |> Enum.map(&Floki.text/1)
         |> Enum.map(&String.trim/1)
         |> Enum.reject(&blank?/1)
+        |> Enum.reject(&reject_uncategorized?/1),
+
+      tags:
+        posted_in
+        |> Floki.find("a")
+        |> Enum.map(&Floki.text/1)
+        |> Enum.map(&String.trim/1)
+        |> Enum.reject(&blank?/1)
+        |> Enum.reject(&reject_uncategorized?/1)
         |> Enum.map(&String.downcase/1),
 
       sku:
