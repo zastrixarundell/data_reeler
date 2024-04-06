@@ -86,8 +86,20 @@ defmodule DataReeler.Crawlers.Topfish do
         
       categories:
         document
+        |> Floki.find("#block-topfish-breadcrumbs li a span")
+        |> Enum.drop(1)
+        |> IO.inspect(label: "categories")
+        |> Enum.map(&Floki.text/1)
+        |> Enum.map(&String.split(&1,"\n"))
+        |> List.flatten()
+        |> Enum.map(&String.trim/1)
+        |> Enum.reject(&blank?/1),
+        
+      tags:
+        document
         |> Floki.find(".commerce-product-default-full__field-category-item > a")
         |> Enum.map(&Floki.text/1)
+        |> Enum.map(&String.downcase/1)
         |> Enum.map(&String.split(&1,"\n"))
         |> List.flatten()
         |> Enum.map(&String.trim/1)
