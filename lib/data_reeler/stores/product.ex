@@ -44,7 +44,7 @@ defmodule DataReeler.Stores.Product do
         encode_xml_field(Enum.join(capitalize_each_element(product.categories), ", ")) <>
       "</categories>" <>
       "<tags>" <>
-        encode_xml_field(Enum.join(capitalize_each_element(product.tags, true), ", ")) <>
+        encode_xml_field(Enum.join(product.tags, ", ")) <>
       "</tags>" <>
       "<brand>" <>
         encode_xml_field(product.brand.name) <>
@@ -57,31 +57,22 @@ defmodule DataReeler.Stores.Product do
       "</image>" <>
     "</product>"
   end
-  
-  defp capitalize_each_element(elements, lowercase \\ false)
 
-  defp capitalize_each_element(elements, lowercase) when is_list(elements) do
+  defp capitalize_each_element(elements) when is_list(elements) do
     elements
-    |> Enum.map(&capitalize_each_element(&1, lowercase))
+    |> Enum.map(&capitalize_each_element/1)
   end
 
-  defp capitalize_each_element(element, false) when is_binary(element) do
+  defp capitalize_each_element(element) when is_binary(element) do
     element
     |> String.split(" ")
     |> Enum.map(&String.capitalize/1)
     |> Enum.join(" ")
   end
   
-  defp capitalize_each_element(element, true) when is_binary(element) do
-    element
-    |> String.split(" ")
-    |> Enum.map(&String.downcase/1)
-    |> Enum.join(" ")
-  end
-  
-  defp capitalize_each_element(nil, _), do: []
+  defp capitalize_each_element(nil), do: []
 
-  defp capitalize_each_element(any, _), do: any
+  defp capitalize_each_element(any), do: any
 
   defp encode_xml_field(field) do
     XMLRPC.Encode.escape_attr("#{field}")
