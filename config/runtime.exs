@@ -47,11 +47,7 @@ config :data_reeler,
   decoupled_crawlers: decoupled_crawlers,
   browserless_fetcher: browserless_fetcher
   
-elasticsearch_url =
-  System.get_env("ELASTICSEARCH_URL") ||
-    raise """
-    You need to specify ELASTICSEARCH_URL, the elasticsearch URL.
-    """
+elasticsearch_url = System.get_env("ELASTICSEARCH_URL")
   
 config :data_reeler, DataReeler.Elasticsearch.Cluster,
   # The URL where Elasticsearch is hosted on your system
