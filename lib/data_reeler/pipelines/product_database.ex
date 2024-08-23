@@ -7,7 +7,7 @@ defmodule DataReeler.Pipelines.ProductDatabase do
   def run(item, state) do
     case DataReeler.Stores.upsert_product_by_sku_and_provider(item) do
       {:ok, _} ->
-        nil
+        Logger.info("Saved product: #{inspect(item)}")
       {:error, error} ->
         Logger.warning("Falied to insert production #{inspect(item)} with error: #{inspect(error)}")
     end
