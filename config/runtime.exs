@@ -44,8 +44,7 @@ decoupled_crawlers =
 
 config :data_reeler,
   server_backoff: String.to_integer(server_backoff),
-  decoupled_crawlers: decoupled_crawlers,
-  browserless_fetcher: browserless_fetcher
+  decoupled_crawlers: decoupled_crawlers
   
 elasticsearch_url = System.get_env("ELASTICSEARCH_URL")
   
