@@ -88,7 +88,6 @@ defmodule DataReeler.Crawlers.Topfish do
         document
         |> Floki.find("#block-topfish-breadcrumbs li a span")
         |> Enum.drop(1)
-        |> IO.inspect(label: "categories")
         |> Enum.map(&Floki.text/1)
         |> Enum.map(&String.split(&1,"\n"))
         |> List.flatten()
