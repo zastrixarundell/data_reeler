@@ -4,10 +4,14 @@ defmodule DataReelerWeb.StoreController do
   alias DataReeler.Stores.Product
 
   def show(conn, %{"store" => store_name}) do
+    normalized_store_name =
+      store_name
+      |> String.replace(~r/\.xml$/, "")
+    
     conn
     |> put_resp_content_type("application/xml")
     |> send_chunked(200)
-    |> stream_data(store_name)
+    |> stream_data(normalized_store_name)
   end
 
   defp stream_data(conn, store_name) do

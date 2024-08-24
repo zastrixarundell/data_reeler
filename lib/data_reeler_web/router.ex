@@ -10,6 +10,8 @@ defmodule DataReelerWeb.Router do
   end
   
   scope "/feed", DataReelerWeb do
+    pipe_through :feed
+
     get "/items", ProductController, :index
     
     get "/stores/:store", StoreController, :show
