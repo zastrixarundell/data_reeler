@@ -11,6 +11,7 @@ defmodule DataReeler.Stores.Product do
     field :price, {:array, :float}
     field :images, {:array, :string}
     field :categories, {:array, :string}
+    field :translated_categories, {:array, :string}, virtual: true
     field :tags, {:array, :string}
 
     belongs_to :brand, DataReeler.Stores.Brand
@@ -41,7 +42,7 @@ defmodule DataReeler.Stores.Product do
         encode_xml_field(product.url) <>
       "</url>" <>
       "<categories>" <>
-        encode_xml_field(Enum.join(capitalize_each_element(product.categories), ", ")) <>
+        encode_xml_field(Enum.join(capitalize_each_element(product.translated_categories), ", ")) <>
       "</categories>" <>
       "<tags>" <>
         encode_xml_field(Enum.join(product.tags, ", ")) <>

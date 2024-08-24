@@ -5,9 +5,9 @@ defmodule DataReeler.Stores do
 
   import Ecto.Query, warn: false
   require Logger
+  
   alias DataReeler.Repo
-
-  alias DataReeler.Stores.Product
+  alias DataReeler.Stores.{Product, CategoryTranslation, Brand}
 
   def upsert_product_by_sku_and_provider(values) do
     product =
@@ -68,12 +68,14 @@ defmodule DataReeler.Stores do
   """
   def product_stream(store_name \\ nil)
 
-  def product_stream(store_name) when is_binary(store_name) do
+  def product_stream(store_name) when not is_nil(store_name) do
     query =
       from p in Product,
         where: p.provider == ^store_name,
         join: brand in assoc(p, :brand),
-        select: %Product{p | brand: brand, brand_id: brand.id}
+        join: translation in CategoryTranslation,
+        on: fragment("? = ?", p.categories, translation.original_categories),
+        select: %Product{p | brand: brand, brand_id: brand.id, translated_categories: translation.translated_categories}
 
     Repo.stream(query)
   end
@@ -82,26 +84,12 @@ defmodule DataReeler.Stores do
     query =
       from p in Product,
         join: brand in assoc(p, :brand),
-        select: %Product{p | brand: brand, brand_id: brand.id}
+        join: translation in CategoryTranslation,
+        on: fragment("? = ?", p.categories, translation.original_categories),
+        select: %Product{p | brand: brand, brand_id: brand.id, translated_categories: translation.translated_categories}
 
     Repo.stream(query)
   end
-
-  @doc """
-  Gets a single product.
-
-  Raises `Ecto.NoResultsError` if the Product does not exist.
-
-  ## Examples
-
-      iex> get_product!(123)
-      %Product{}
-
-      iex> get_product!(456)
-      ** (Ecto.NoResultsError)
-
-  """
-  def get_product!(id), do: Repo.get!(Product, id)
 
   @doc """
   Creates a product.
@@ -137,50 +125,6 @@ defmodule DataReeler.Stores do
     product
     |> Product.changeset(attrs)
     |> Repo.update()
-  end
-
-  @doc """
-  Deletes a product.
-
-  ## Examples
-
-      iex> delete_product(product)
-      {:ok, %Product{}}
-
-      iex> delete_product(product)
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def delete_product(%Product{} = product) do
-    Repo.delete(product)
-  end
-
-  @doc """
-  Returns an `%Ecto.Changeset{}` for tracking product changes.
-
-  ## Examples
-
-      iex> change_product(product)
-      %Ecto.Changeset{data: %Product{}}
-
-  """
-  def change_product(%Product{} = product, attrs \\ %{}) do
-    Product.changeset(product, attrs)
-  end
-
-  alias DataReeler.Stores.Brand
-
-  @doc """
-  Returns the list of brands.
-
-  ## Examples
-
-      iex> list_brands()
-      [%Brand{}, ...]
-
-  """
-  def list_brands do
-    Repo.all(Brand)
   end
 
   def find_or_create_brand_by_name(name) do
@@ -233,22 +177,6 @@ defmodule DataReeler.Stores do
     %Brand{}
     |> Brand.changeset(attrs)
     |> Repo.insert()
-  end
-
-  @doc """
-  Deletes a brand.
-
-  ## Examples
-
-      iex> delete_brand(brand)
-      {:ok, %Brand{}}
-
-      iex> delete_brand(brand)
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def delete_brand(%Brand{} = brand) do
-    Repo.delete(brand)
   end
 
   @doc """

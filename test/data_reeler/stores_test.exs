@@ -15,11 +15,6 @@ defmodule DataReeler.StoresTest do
       assert Stores.list_products() == [product]
     end
 
-    test "get_product!/1 returns the product with given id" do
-      product = product_fixture()
-      assert Stores.get_product!(product.id) == product
-    end
-
     test "create_product/1 with valid data creates a product" do
       valid_attrs = %{description: ["option1", "option2"], title: "some title", url: "some url", provider: "some provider", sku: "some sku", price: [], images: ["option1", "option2"], categories: ["option1", "option2"]}
 
@@ -56,18 +51,6 @@ defmodule DataReeler.StoresTest do
     test "update_product/2 with invalid data returns error changeset" do
       product = product_fixture()
       assert {:error, %Ecto.Changeset{}} = Stores.update_product(product, @invalid_attrs)
-      assert product == Stores.get_product!(product.id)
-    end
-
-    test "delete_product/1 deletes the product" do
-      product = product_fixture()
-      assert {:ok, %Product{}} = Stores.delete_product(product)
-      assert_raise Ecto.NoResultsError, fn -> Stores.get_product!(product.id) end
-    end
-
-    test "change_product/1 returns a product changeset" do
-      product = product_fixture()
-      assert %Ecto.Changeset{} = Stores.change_product(product)
     end
   end
 
@@ -77,11 +60,6 @@ defmodule DataReeler.StoresTest do
     import DataReeler.StoresFixtures
 
     @invalid_attrs %{name: nil}
-
-    test "list_brands/0 returns all brands" do
-      brand = brand_fixture()
-      assert Stores.list_brands() == [brand]
-    end
 
     test "get_brand!/1 returns the brand with given id" do
       brand = brand_fixture()
@@ -111,12 +89,6 @@ defmodule DataReeler.StoresTest do
       brand = brand_fixture()
       assert {:error, %Ecto.Changeset{}} = Stores.update_brand(brand, @invalid_attrs)
       assert brand == Stores.get_brand!(brand.id)
-    end
-
-    test "delete_brand/1 deletes the brand" do
-      brand = brand_fixture()
-      assert {:ok, %Brand{}} = Stores.delete_brand(brand)
-      assert_raise Ecto.NoResultsError, fn -> Stores.get_brand!(brand.id) end
     end
 
     test "change_brand/1 returns a brand changeset" do
