@@ -43,11 +43,28 @@ mix elasticsearch.build products --cluster DataReeler.Elasticsearch.Cluster
 
 ### Starting the crawlers
 
-To start the crawlers, run this command:
+To start all crawlers, run this command:
 
-`mix data_reeler.crawlers`
+```bash
+mix data_reeler.crawlers
+```
 
-Or alternatively if `DECOUPLED_CRAWLERS` is set to `false`, it will run the crawlers with the application.
+Or alternatively if `DECOUPLED_CRAWLERS` is set to `false`, it will run the crawlers alongside the server.
+
+To start an individual crawler, head to the [Server](./lib/data_reeler/servers/) folder and find the last part of the module CamelCase name. Example: `DataReeler.Servers.MyStore`. Then run the following comamnd:
+
+```bash
+mix data_reeler.crawlers --crawler my_store
+```
+
+You can also run multiple crawlers like this:
+
+```bash
+mix data_reeler.crawlers \
+  --crawler my_store \
+  --crawler another_store \
+  --crawler yet_another_store
+```
 
 ## Starting the server
 
