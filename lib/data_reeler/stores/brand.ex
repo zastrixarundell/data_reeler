@@ -14,6 +14,7 @@ defmodule DataReeler.Stores.Brand do
   def changeset(brand, attrs) do
     brand
     |> cast(attrs, [:name])
+    |> validate_length(:name, max: 255)
     |> validate_required([:name])
   end
 end

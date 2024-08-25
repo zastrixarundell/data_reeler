@@ -24,6 +24,9 @@ defmodule DataReeler.Stores.Product do
     product
     |> cast(attrs, [:sku, :price, :images, :categories, :provider, :url, :title, :description, :brand_id, :tags])
     |> validate_required([:sku, :price, :images, :categories, :provider, :url, :title, :description, :brand_id, :tags])
+    |> validate_length(:sku, max: 255)
+    |> validate_length(:provider, max: 255)
+    |> validate_length(:title, max: 255)
     |> unique_constraint([:sku, :provider], name: :unique_sku_on_provider)
   end
 
