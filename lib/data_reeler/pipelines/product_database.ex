@@ -13,7 +13,7 @@ defmodule DataReeler.Pipelines.ProductDatabase do
           Logger.warning("Falied to insert production #{inspect(item)} with error: #{inspect(error)}")
       end
     rescue
-      e in RuntimeError -> e
+      e in Postgrex.Error -> e
         Logger.error("Failed to save #{inspect(item)}")
         Logger.error("Error is: #{inspect(e)}")
         raise "nope"
