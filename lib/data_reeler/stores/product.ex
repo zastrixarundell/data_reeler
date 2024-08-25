@@ -23,7 +23,7 @@ defmodule DataReeler.Stores.Product do
   def changeset(product, attrs) do
     product
     |> cast(attrs, [:sku, :price, :images, :categories, :provider, :url, :title, :description, :brand_id, :tags])
-    |> validate_required([:sku, :price, :images, :categories, :provider, :url, :title, :description, :brand_id])
+    |> validate_required([:sku, :price, :images, :categories, :provider, :url, :title, :description, :brand_id, :tags])
     |> unique_constraint([:sku, :provider], name: :unique_sku_on_provider)
   end
 
