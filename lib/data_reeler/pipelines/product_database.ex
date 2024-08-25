@@ -14,8 +14,9 @@ defmodule DataReeler.Pipelines.ProductDatabase do
       end
     rescue
       e in RuntimeError -> e
-        Logger.error("Failed to save #{item}")
-        rairse "nope"
+        Logger.error("Failed to save #{inspect(item)}")
+        Logger.error("Error is: #{inspect(e)}")
+        raise "nope"
     end
 
     {item, state}
