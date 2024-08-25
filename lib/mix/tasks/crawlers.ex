@@ -24,7 +24,7 @@ defmodule Mix.Tasks.DataReeler.Crawlers do
     else
       {:error, :invalid_crawler_options, opts} ->
         opts
-        |> Enum.map(&"* Unkown option: #{&1}")
+        |> Enum.map(&"* Unkown option or missing crawler name: #{&1}")
         |> Enum.join("\n")
         |> tap(&IO.write(:stderr, "Failed to start command.\n\n#{&1}\n"))
         
@@ -58,7 +58,7 @@ defmodule Mix.Tasks.DataReeler.Crawlers do
       module_names
       |> Enum.filter(fn response ->
         case response do
-          {:error, name} ->
+          {:error, _name} ->
             true
             
           _ ->
