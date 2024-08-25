@@ -20,14 +20,7 @@ defmodule DataReeler.Application do
     
     children =
       children
-      |> conditional_append(
-          should_start_crawlers?(),
-          [
-            DataReeler.Servers.Plovakplus,
-            DataReeler.Servers.Formaxstore,
-            DataReeler.Servers.Topfish
-          ]
-        )
+      |> conditional_append(should_start_crawlers?(), crawler_list())
       |> conditional_append(should_start_elasticsearch?(), [DataReeler.Elasticsearch.Cluster])
 
     # See https://hexdocs.pm/elixir/Supervisor.html
@@ -45,6 +38,18 @@ defmodule DataReeler.Application do
   
   defp should_start_crawlers?() do
     Application.get_env(:data_reeler, :called_in_task) == true or Application.get_env(:data_reeler, :decoupled_crawlers) == "false"
+  end
+  
+  defp crawler_list() do
+    Application.get_env(
+      :data_reeler,
+      :called_task_modules,
+      [
+        DataReeler.Servers.Plovakplus,
+        DataReeler.Servers.Formaxstore,
+        DataReeler.Servers.Topfish
+      ]
+    )
   end
   
   defp should_start_elasticsearch?() do
