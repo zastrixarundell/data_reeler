@@ -28,7 +28,9 @@ RUN asdf plugin add elixir
 
 RUN asdf install
 
-COPY . .
+COPY mix.exs .
+
+COPY mix.lock .
 
 USER root
 
@@ -43,6 +45,8 @@ USER user
 RUN mix deps.get
 
 RUN mix deps.compile
+
+RUN mix compile
 
 ENTRYPOINT [ "mix" ]
 
