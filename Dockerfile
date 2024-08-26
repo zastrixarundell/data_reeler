@@ -42,6 +42,8 @@ RUN chmod 744 _build deps mix.lock
 
 USER user
 
+COPY . .
+
 RUN mix deps.get
 
 RUN mix deps.compile
