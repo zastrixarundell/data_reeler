@@ -52,4 +52,4 @@ RUN mix compile
 
 ENTRYPOINT [ "mix" ]
 
-CMD [ "phx.s" ]
+CMD [ "phx.server" ]
