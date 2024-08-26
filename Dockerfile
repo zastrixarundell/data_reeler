@@ -1,4 +1,4 @@
-FROM debian:stable as builder
+FROM debian:stable-slim as builder
 
 RUN apt update && apt upgrade -y -qq
 
@@ -44,28 +44,6 @@ RUN mix deps.get
 
 RUN mix deps.compile
 
-RUN mix release prod
+ENTRYPOINT [ "mix" ]
 
-# Exit stage
-
-FROM debian:stable-slim
-
-RUN apt update
-
-RUN apt upgrade -y -qq
-
-RUN apt install -y libssl-dev
-
-ENV CD_USER=user
-
-RUN useradd -ms $(which bash) user
-
-WORKDIR /app
-
-COPY --from=builder /build/_build/prod/rel/prod .
-
-USER $CD_USER
-
-# ENV ELIXIR_ERL_OPTIONS="+fnu"
-
-CMD ["/app/bin/prod", "start"]
+CMD [ "mix", "phx.s" ]
