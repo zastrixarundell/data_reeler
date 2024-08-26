@@ -50,4 +50,6 @@ RUN mix deps.compile
 
 RUN mix compile
 
-CMD [ "mix", "phx.s" ]
+ENTRYPOINT [ "mix" ]
+
+CMD [ "phx.s" ]
