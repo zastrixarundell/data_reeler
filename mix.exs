@@ -9,7 +9,8 @@ defmodule DataReeler.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+      releases: releases()
     ]
   end
 
@@ -20,6 +21,14 @@ defmodule DataReeler.MixProject do
     [
       mod: {DataReeler.Application, []},
       extra_applications: [:logger, :runtime_tools]
+    ]
+  end
+  
+  def releases do
+    [
+      prod: [
+        include_executables_for: [:unix]
+      ]
     ]
   end
 

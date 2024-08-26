@@ -1,0 +1,11 @@
+/_build/
+/.elixir_ls/
+/deps/
+/cover/docks/
+/test/
+README.md
+Dockerfile
+docker-compose.yml
+.gitignore
+.dockerignore
+.formatter.exs
