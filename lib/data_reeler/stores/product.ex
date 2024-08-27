@@ -54,7 +54,7 @@ defmodule DataReeler.Stores.Product do
         encode_xml_field(product.brand.name) <>
       "</brand>" <>
       "<price>" <>
-        encode_xml_field(product.price |> List.first() |> :erlang.float_to_binary(price, decimals: 2)) <>
+        encode_xml_field(product.price |> List.first() |> :erlang.float_to_binary(decimals: 2)) <>
       "</price>" <>
       "<image>" <>
         encode_xml_field(product.images |> List.first())<>
