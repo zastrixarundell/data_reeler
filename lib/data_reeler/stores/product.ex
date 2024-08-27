@@ -33,7 +33,7 @@ defmodule DataReeler.Stores.Product do
   def encode_xml(%__MODULE__{} = product) do
     "<product>" <>
       "<pid>" <>
-        encode_xml_field(product.sku) <>
+        encode_xml_field(product.id) <>
       "</pid>" <>
       "<name>" <>
         encode_xml_field(product.title) <>
@@ -54,7 +54,7 @@ defmodule DataReeler.Stores.Product do
         encode_xml_field(product.brand.name) <>
       "</brand>" <>
       "<price>" <>
-        encode_xml_field(Enum.join(Enum.map(product.price, fn price -> :erlang.float_to_binary(price, decimals: 2) end), ", ")) <>
+        encode_xml_field(product.price |> List.first() |> :erlang.float_to_binary(price, decimals: 2)) <>
       "</price>" <>
       "<image>" <>
         encode_xml_field(product.images |> List.first())<>
