@@ -122,6 +122,10 @@ defmodule DataReeler.Stores do
 
   """
   def update_product(%Product{} = product, attrs) do
+    attrs =
+      attrs
+      |> Map.put(:accessed_at, DateTime.utc_now())
+
     product
     |> Product.changeset(attrs)
     |> Repo.update()

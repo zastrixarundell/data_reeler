@@ -13,6 +13,8 @@ defmodule DataReeler.Stores.Product do
     field :categories, {:array, :string}
     field :translated_categories, {:array, :string}, virtual: true
     field :tags, {:array, :string}
+    
+    field :accessed_at, :naive_datetime
 
     belongs_to :brand, DataReeler.Stores.Brand
 
@@ -22,7 +24,7 @@ defmodule DataReeler.Stores.Product do
   @doc false
   def changeset(product, attrs) do
     product
-    |> cast(attrs, [:sku, :price, :images, :categories, :provider, :url, :title, :description, :brand_id, :tags])
+    |> cast(attrs, [:sku, :price, :images, :categories, :provider, :url, :title, :description, :brand_id, :tags, :accessed_at])
     |> validate_required([:sku, :price, :images, :categories, :provider, :url, :title, :description, :brand_id, :tags])
     |> validate_length(:sku, max: 255)
     |> validate_length(:provider, max: 255)
