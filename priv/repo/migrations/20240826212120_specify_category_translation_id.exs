@@ -19,7 +19,11 @@ defmodule DataReeler.Repo.Migrations.SpecifyCategoryTranslationId do
   
   def down do
     execute """
-      CREATE OR REPLACE VIEW potentially_missing_translations AS
+      DROP VIEW potentially_missing_translations
+    """
+
+    execute """
+      CREATE VIEW potentially_missing_translations AS
         SELECT
           products.categories AS original_categories,
           category_translations.translated_categories AS translated_categories
