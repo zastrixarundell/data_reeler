@@ -21,7 +21,7 @@ defmodule DataReeler.Repo.Migrations.ViewWithProductCount do
   def down do
     execute """
       DROP VIEW potentially_missing_translations;
-      """
+    """
 
     execute """
       CREATE VIEW potentially_missing_translations AS
