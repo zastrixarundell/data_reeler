@@ -24,11 +24,11 @@ defmodule DataReeler.Stores do
 
       case product do
         nil ->
-          create_product(values)
+          %{product: create_product(values), accessed_at_old: nil}
 
         existing ->
           Logger.debug("Product with values: #{inspect(%{sku: values.sku, provider: values.provider, title: values.title})} already exists!", ansi_color: :yellow)
-          update_product(existing, values)
+          %{product: update_product(existing, values), accessed_at_old: existing.accessed_at}
       end
     else
       error_message ->
@@ -196,7 +196,24 @@ defmodule DataReeler.Stores do
     Brand.changeset(brand, attrs)
   end
   
-  def log_crawler_access(crawler_name) do
+  def log_crawler_access(nil, cralwer_name) do
+    log_crawler_access(cralwer_name)
+  end
+  
+  def log_crawler_access(aao, crawler_name) do
+    aao_date = aao |> NaiveDateTime.to_date()
+    date_now = Date.utc_today()
+    
+    if (aao_date == date_now) do
+      Logger.debug("Product date already logged.")
+      :ok
+    else
+      log_crawler_access(crawler_name)
+    end
+    
+  end
+  
+  defp log_crawler_access(crawler_name) do
     potential_log =
       Repo.one(
         from ca in CrawlerAccess,

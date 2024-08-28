@@ -5,8 +5,8 @@ defmodule DataReeler.Pipelines.ProductDatabase do
 
   @impl Crawly.Pipeline
   def run(item, state) do
-    with {:ok, _} <- DataReeler.Stores.upsert_product_by_sku_and_provider(item),
-         :ok <- DataReeler.Stores.log_crawler_access(item.provider) do
+    with %{product: {:ok, _}, accessed_at_old: aao} <- DataReeler.Stores.upsert_product_by_sku_and_provider(item),
+         :ok <- DataReeler.Stores.log_crawler_access(aao, item.provider) do
       Logger.info("Saved product: #{inspect(item)}")
     else
       {:error, error} ->
