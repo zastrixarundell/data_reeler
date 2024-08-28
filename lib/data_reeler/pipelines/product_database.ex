@@ -5,11 +5,15 @@ defmodule DataReeler.Pipelines.ProductDatabase do
 
   @impl Crawly.Pipeline
   def run(item, state) do
-    case DataReeler.Stores.upsert_product_by_sku_and_provider(item) do
-      {:ok, _} ->
-        Logger.info("Saved product: #{inspect(item)}")
+    with {:ok, _} <- DataReeler.Stores.upsert_product_by_sku_and_provider(item),
+         :ok <- DataReeler.Stores.log_crawler_access(item.provider) do
+      Logger.info("Saved product: #{inspect(item)}")
+    else
       {:error, error} ->
         Logger.warning("Falied to insert production #{inspect(item)} with error: #{inspect(error)}")
+        
+      {:error, :failed_log, error} ->
+        Logger.error("Falied to save log for #{inspect(item)} with error: #{inspect(error)}")
     end
 
     {item, state}

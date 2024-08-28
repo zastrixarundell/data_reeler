@@ -7,7 +7,7 @@ defmodule DataReeler.Stores do
   require Logger
   
   alias DataReeler.Repo
-  alias DataReeler.Stores.{Product, CategoryTranslation, Brand}
+  alias DataReeler.Stores.{Product, CategoryTranslation, Brand, CrawlerAccess}
 
   def upsert_product_by_sku_and_provider(values) do
     product =
@@ -194,5 +194,49 @@ defmodule DataReeler.Stores do
   """
   def change_brand(%Brand{} = brand, attrs \\ %{}) do
     Brand.changeset(brand, attrs)
+  end
+  
+  def log_crawler_access(crawler_name) do
+    potential_log =
+      Repo.one(
+        from ca in CrawlerAccess,
+          where: ca.crawler_name == ^crawler_name,
+          where: fragment("CAST(inserted_at AS DATE) = CAST(NOW() AS DATE)"),
+          select: ca.id
+      )
+      
+    case potential_log do
+      nil ->
+        Logger.debug("No #{crawler_name} log found for today... Creating one")
+        
+        insert_resp =
+          %CrawlerAccess{}
+          |> CrawlerAccess.changeset(%{crawler_name: crawler_name})
+          |> Repo.insert()
+          
+        case insert_resp do
+          {:ok, _} ->
+            :ok
+            
+          {:error, reason} ->
+            {:error, :failed_log, reason}
+        end
+
+      log_id ->
+        Logger.debug("#{crawler_name} log found for today, incrementing")
+        
+        query =
+          from ca in CrawlerAccess,
+            where: ca.id == ^log_id
+        
+        Repo.update_all(
+          query,
+          inc: [access_count: 1]
+        )
+        
+        :ok
+    end
+    
+    :ok
   end
 end
