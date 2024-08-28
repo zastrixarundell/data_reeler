@@ -10,32 +10,41 @@ defmodule DataReeler.Stores do
   alias DataReeler.Stores.{Product, CategoryTranslation, Brand}
 
   def upsert_product_by_sku_and_provider(values) do
-    product =
-      Repo.one(
-        from p in Product,
-        where: p.sku == ^values.sku,
-        where: p.provider == ^values.provider
-      )
-
-    {brand_name, values} = Map.pop(values, :brand_name)
-
-    with {:ok, brand} <- find_or_create_brand_by_name(brand_name) do
-      values = Map.put(values, :brand_id, brand.id)
-
-      case product do
-        nil ->
-          %{product: create_product(values), accessed_at_old: nil}
-
-        existing ->
-          Logger.debug("Product with values: #{inspect(%{sku: values.sku, provider: values.provider, title: values.title})} already exists!", ansi_color: :yellow)
-          %{product: update_product(existing, values), accessed_at_old: existing.accessed_at}
+    type_check =
+      %Product{brand_id: 1}
+        |> Product.set_accessed_at()
+        |> Product.changeset(values)
+      
+    if type_check.valid? do
+      product =
+        Repo.one(
+          from p in Product,
+          where: p.sku == ^values.sku,
+          where: p.provider == ^values.provider
+        )
+  
+      {brand_name, values} = Map.pop(values, :brand_name)
+  
+      with {:ok, brand} <- find_or_create_brand_by_name(brand_name) do
+        values = Map.put(values, :brand_id, brand.id)
+  
+        case product do
+          nil ->
+            %{product: create_product(values), accessed_at_old: nil}
+  
+          existing ->
+            Logger.debug("Product with values: #{inspect(%{sku: values.sku, provider: values.provider, title: values.title})} already exists!", ansi_color: :yellow)
+            %{product: update_product(existing, values), accessed_at_old: existing.accessed_at}
+        end
+      else
+        error_message ->
+          error_message
       end
     else
-      error_message ->
-        error_message
+      {:error, type_check}
     end
   end
-
+  
   @doc """
   Get random product URLs from the database for the given provider.
   """

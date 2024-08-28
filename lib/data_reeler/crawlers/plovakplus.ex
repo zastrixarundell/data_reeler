@@ -2,6 +2,8 @@ defmodule DataReeler.Crawlers.Plovakplus do
   use DataReeler.Crawler
 
   alias DataReeler.Servers.Plovakplus, as: Server
+  
+  import DataReeler.Utils.CrawlerHelpers
 
   @impl Crawly.Spider
   def base_url(), do: "https://www.plovakplus.rs/prodavnica/"
@@ -153,9 +155,8 @@ defmodule DataReeler.Crawlers.Plovakplus do
       sku:
         document
         |> Floki.find("#primary")
-        |> Floki.find("span.sku")
-        |> Floki.text()
-        |> String.trim(),
+        |> Floki.find("span.ean")
+        |> barcode_extraction(~r/(\d+)/i),
 
       description:
         document
@@ -236,17 +237,6 @@ defmodule DataReeler.Crawlers.Plovakplus do
     |> Enum.uniq()
     |> Enum.map(&build_absolute_url/1)
     |> Enum.map(&Crawly.Utils.request_from_url/1)
-  end
-
-  defp normalize_price(price) when is_bitstring(price) do
-    price
-    |> String.replace(~r/[,.]/, "")
-    |> String.to_integer()
-    |> Kernel./(100.00)
-  end
-
-  defp normalize_price(_) do
-    -1
   end
 
   defp reject_uncategorized?({_, _, [text]}) when is_bitstring(text) do

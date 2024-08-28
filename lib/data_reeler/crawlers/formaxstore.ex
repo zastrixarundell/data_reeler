@@ -1,5 +1,7 @@
 defmodule DataReeler.Crawlers.Formaxstore do
   use DataReeler.Crawler
+  
+  import DataReeler.Utils.CrawlerHelpers
 
   @impl Crawly.Spider
   def base_url(), do: "https://www.formaxstore.com/"
@@ -80,10 +82,11 @@ defmodule DataReeler.Crawlers.Formaxstore do
         |> List.flatten()
         |> Enum.map(&String.trim/1)
         |> Enum.reject(&blank?/1),
+
       sku:
         document
-        |> Floki.find(".product-details-info > .code > span")
-        |> Floki.text(),
+        |> Floki.find(".product-details-info > .code > .code")
+        |> barcode_extraction(~r/^barkod: *?(\d+)$/i),
         
       categories:
         document
@@ -167,13 +170,6 @@ defmodule DataReeler.Crawlers.Formaxstore do
           array
         end
     end
-  end
-
-  defp normalize_price(price) when is_bitstring(price) do
-    price
-    |> String.replace(~r/[,.]/, "")
-    |> String.to_integer()
-    |> Kernel./(100.00)
   end
 
   def item_urls!(document) do

@@ -10,7 +10,7 @@ defmodule DataReeler.Pipelines.ProductDatabase do
       Logger.info("Saved product: #{inspect(item)}")
     else
       {:error, error} ->
-        Logger.warning("Falied to insert production #{inspect(item)} with error: #{inspect(error)}")
+        Logger.warning("Falied to insert product #{inspect(item)} with error: #{inspect(error)}")
         
       {:error, :failed_log, error} ->
         Logger.error("Falied to save log for #{inspect(item)} with error: #{inspect(error)}")
