@@ -86,7 +86,7 @@ defmodule DataReeler.Crawlers.Formaxstore do
       barcode:
         document
         |> Floki.find(".product-details-info > .code > .code")
-        |> barcode_extraction(~r/^barkod: *?(\d+)$/i),
+        |> barcode_extraction(~r/^barkod: *?(\d{8,128})$/i),
 
       categories:
         document

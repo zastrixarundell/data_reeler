@@ -72,10 +72,7 @@ defmodule DataReeler.Crawlers.Topfish do
         |> Enum.map(&String.trim/1)
         |> Enum.reject(&blank?/1),
 
-      barcode:
-        document
-        |> Floki.find(".commerce-product-variation-default-full__barcode-item")
-        |> Floki.text(),
+      barcode: "",
 
       images:
         document

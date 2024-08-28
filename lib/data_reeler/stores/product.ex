@@ -26,7 +26,7 @@ defmodule DataReeler.Stores.Product do
     product
     |> cast(attrs, [:barcode, :price, :images, :categories, :provider, :url, :title, :description, :brand_id, :tags, :accessed_at])
     |> validate_required([:barcode, :price, :images, :categories, :provider, :url, :title, :description, :brand_id, :tags])
-    |> validate_length(:barcode, min: 8, max: 128)
+    |> validate_format(:barcode, ~r/^\d{8,128}$/, message: "barcode must be between 8 and 128 characters long, only made of digits")
     |> validate_length(:provider, max: 255)
     |> validate_length(:title, max: 255)
     |> unique_constraint([:barcode, :provider], name: :unique_barcode_on_provider)
