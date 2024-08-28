@@ -31,6 +31,10 @@ defmodule DataReeler.Stores.Product do
     |> validate_length(:title, max: 255)
     |> unique_constraint([:sku, :provider], name: :unique_sku_on_provider)
   end
+  
+  def set_accessed_at(%__MODULE__{} = product) do
+    %__MODULE__{product | accessed_at: NaiveDateTime.utc_now()}
+  end
 
   def encode_xml(%__MODULE__{} = product) do
     "<product>" <>

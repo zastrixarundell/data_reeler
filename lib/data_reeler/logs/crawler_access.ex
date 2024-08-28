@@ -1,4 +1,4 @@
-defmodule DataReeler.Stores.CrawlerAccess do
+defmodule DataReeler.Logs.CrawlerAccess do
   use Ecto.Schema
   import Ecto.Changeset
 
