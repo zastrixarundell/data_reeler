@@ -7,13 +7,13 @@ defmodule DataReeler.Stores.Product do
     field :title, :string
     field :url, :string
     field :provider, :string
-    field :sku, :string
+    field :barcode, :string
     field :price, {:array, :float}
     field :images, {:array, :string}
     field :categories, {:array, :string}
     field :translated_categories, {:array, :string}, virtual: true
     field :tags, {:array, :string}
-    
+
     field :accessed_at, :naive_datetime
 
     belongs_to :brand, DataReeler.Stores.Brand
@@ -24,14 +24,14 @@ defmodule DataReeler.Stores.Product do
   @doc false
   def changeset(product, attrs) do
     product
-    |> cast(attrs, [:sku, :price, :images, :categories, :provider, :url, :title, :description, :brand_id, :tags, :accessed_at])
-    |> validate_required([:sku, :price, :images, :categories, :provider, :url, :title, :description, :brand_id, :tags])
-    |> validate_length(:sku, max: 255)
+    |> cast(attrs, [:barcode, :price, :images, :categories, :provider, :url, :title, :description, :brand_id, :tags, :accessed_at])
+    |> validate_required([:barcode, :price, :images, :categories, :provider, :url, :title, :description, :brand_id, :tags])
+    |> validate_length(:barcode, min: 8, max: 128)
     |> validate_length(:provider, max: 255)
     |> validate_length(:title, max: 255)
-    |> unique_constraint([:sku, :provider], name: :unique_sku_on_provider)
+    |> unique_constraint([:barcode, :provider], name: :unique_barcode_on_provider)
   end
-  
+
   def set_accessed_at(%__MODULE__{} = product) do
     %__MODULE__{product | accessed_at: NaiveDateTime.utc_now()}
   end
@@ -39,7 +39,7 @@ defmodule DataReeler.Stores.Product do
   def encode_xml(%__MODULE__{} = product) do
     "<product>" <>
       "<pid>" <>
-        encode_xml_field(product.id) <>
+        encode_xml_field(product.barcode) <>
       "</pid>" <>
       "<name>" <>
         encode_xml_field(product.title) <>
@@ -79,7 +79,7 @@ defmodule DataReeler.Stores.Product do
     |> Enum.map(&String.capitalize/1)
     |> Enum.join(" ")
   end
-  
+
   defp capitalize_each_element(nil), do: []
 
   defp capitalize_each_element(any), do: any
@@ -101,7 +101,7 @@ defmodule DataReeler.Stores.Product do
         description: product.description,
         url: product.url,
         provider: product.provider,
-        sku: product.sku,
+        barcode: product.barcode,
         price: product.price,
         images: product.images,
         categories: product.categories

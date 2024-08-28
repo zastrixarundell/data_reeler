@@ -1,6 +1,6 @@
 defmodule DataReeler.Crawlers.Topfish do
   use DataReeler.Crawler
-  
+
   @impl Crawly.Spider
   def base_url(), do: "https://www.topfish.rs/"
 
@@ -72,9 +72,9 @@ defmodule DataReeler.Crawlers.Topfish do
         |> Enum.map(&String.trim/1)
         |> Enum.reject(&blank?/1),
 
-      sku:
+      barcode:
         document
-        |> Floki.find(".commerce-product-variation-default-full__sku-item")
+        |> Floki.find(".commerce-product-variation-default-full__barcode-item")
         |> Floki.text(),
 
       images:
@@ -83,7 +83,7 @@ defmodule DataReeler.Crawlers.Topfish do
         |> Floki.find("img")
         |> Floki.attribute("src")
         |> Enum.map(fn path -> build_absolute_url(path) end),
-        
+
       categories:
         document
         |> Floki.find("#block-topfish-breadcrumbs li a span")
@@ -93,7 +93,7 @@ defmodule DataReeler.Crawlers.Topfish do
         |> List.flatten()
         |> Enum.map(&String.trim/1)
         |> Enum.reject(&blank?/1),
-        
+
       tags:
         document
         |> Floki.find(".commerce-product-default-full__field-category-item > a")
@@ -171,9 +171,9 @@ defmodule DataReeler.Crawlers.Topfish do
 
     {[], requests}
   end
-  
+
   defp extract_max_page(nil), do: []
-  
+
   defp extract_max_page(href) do
     href
     |> URI.parse()

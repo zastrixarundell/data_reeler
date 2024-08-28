@@ -1,6 +1,6 @@
 defmodule DataReeler.Crawlers.Formaxstore do
   use DataReeler.Crawler
-  
+
   import DataReeler.Utils.CrawlerHelpers
 
   @impl Crawly.Spider
@@ -83,11 +83,11 @@ defmodule DataReeler.Crawlers.Formaxstore do
         |> Enum.map(&String.trim/1)
         |> Enum.reject(&blank?/1),
 
-      sku:
+      barcode:
         document
         |> Floki.find(".product-details-info > .code > .code")
         |> barcode_extraction(~r/^barkod: *?(\d+)$/i),
-        
+
       categories:
         document
         |> Floki.find(".block.breadcrumbs li:not(.active)")
@@ -96,7 +96,7 @@ defmodule DataReeler.Crawlers.Formaxstore do
         |> Enum.map(&String.trim/1)
         |> Enum.reject(&blank?/1)
         |> capitalize_first_element(),
-      
+
       tags:
         document
         |> Floki.find("table.product-attrbite-table")
@@ -153,16 +153,16 @@ defmodule DataReeler.Crawlers.Formaxstore do
       )
     }
   end
-  
+
   defp capitalize_first_element(array) when is_list(array) do
     with elements when elements > 1 <- Enum.count(array) do
       [head | tail] = array
-      
+
       [String.capitalize(head)] ++ tail
     else
       _ ->
         if Enum.count(array) == 1 do
-          array 
+          array
           |> List.first()
           |> String.capitalize()
           |> List.wrap()

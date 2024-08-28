@@ -2,7 +2,7 @@ defmodule DataReeler.Crawlers.Plovakplus do
   use DataReeler.Crawler
 
   alias DataReeler.Servers.Plovakplus, as: Server
-  
+
   import DataReeler.Utils.CrawlerHelpers
 
   @impl Crawly.Spider
@@ -133,7 +133,7 @@ defmodule DataReeler.Crawlers.Plovakplus do
         |> Floki.find("h2.product_title.entry-title.show-product-nav")
         |> Floki.text()
         |> String.trim(),
-        
+
       categories:
         document
         |> Floki.find("ul.breadcrumb > li a[itemprop=item]")
@@ -152,7 +152,7 @@ defmodule DataReeler.Crawlers.Plovakplus do
         |> Enum.reject(&reject_uncategorized?/1)
         |> Enum.map(&String.downcase/1),
 
-      sku:
+      barcode:
         document
         |> Floki.find("#primary")
         |> Floki.find("span.ean")
