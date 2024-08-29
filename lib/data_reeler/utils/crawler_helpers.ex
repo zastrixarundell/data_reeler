@@ -1,9 +1,9 @@
-defmodule DataReeler.Utils.CrawlerHelpers do  
-  def barcode_extraction([], %Regex{}) do
+defmodule DataReeler.Utils.CrawlerHelpers do
+  def floki_regex_extraction([], %Regex{}) do
     nil
   end
-  
-  def barcode_extraction(floki_elements, %Regex{} = regex) do
+
+  def floki_regex_extraction(floki_elements, %Regex{} = regex) do
     floki_elements
     |> Enum.find_value(fn floki_element ->
         floki_element
@@ -13,14 +13,15 @@ defmodule DataReeler.Utils.CrawlerHelpers do
         |> List.last()
       end)
   end
-  
+
   def normalize_price(price) when is_bitstring(price) do
     price
-    |> String.replace(~r/[,.]/, "")
+    |> String.trim()
+    |> String.replace(~r/[,\.]/, "")
     |> String.to_integer()
     |> Kernel./(100.00)
   end
-  
+
   def normalize_price(_) do
     -1
   end

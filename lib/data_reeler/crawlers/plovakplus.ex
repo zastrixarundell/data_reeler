@@ -156,7 +156,7 @@ defmodule DataReeler.Crawlers.Plovakplus do
         document
         |> Floki.find("#primary")
         |> Floki.find("span.ean")
-        |> barcode_extraction(~r/(\d{8,128})/i),
+        |> floki_regex_extraction(~r/(\d{8,128})/i),
 
       description:
         document
