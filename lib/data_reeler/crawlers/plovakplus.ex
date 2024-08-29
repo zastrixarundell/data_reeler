@@ -121,11 +121,6 @@ defmodule DataReeler.Crawlers.Plovakplus do
   end
 
   defp item!(document, response) do
-    posted_in =
-      document
-      |> Floki.find("#primary")
-      |> Floki.find("span.posted_in")
-
     %{
       title:
         document
@@ -142,15 +137,6 @@ defmodule DataReeler.Crawlers.Plovakplus do
         |> Enum.map(&String.trim/1)
         |> Enum.reject(&blank?/1)
         |> Enum.reject(&reject_uncategorized?/1),
-
-      tags:
-        posted_in
-        |> Floki.find("a")
-        |> Enum.map(&Floki.text/1)
-        |> Enum.map(&String.trim/1)
-        |> Enum.reject(&blank?/1)
-        |> Enum.reject(&reject_uncategorized?/1)
-        |> Enum.map(&String.downcase/1),
 
       barcode:
         document

@@ -12,7 +12,6 @@ defmodule DataReeler.Stores.Product do
     field :images, {:array, :string}
     field :categories, {:array, :string}
     field :translated_categories, {:array, :string}, virtual: true
-    field :tags, {:array, :string}
 
     field :accessed_at, :naive_datetime
 
@@ -24,7 +23,7 @@ defmodule DataReeler.Stores.Product do
   @doc false
   def changeset(product, attrs) do
     product
-    |> cast(attrs, [:barcode, :price, :images, :categories, :provider, :url, :title, :description, :brand_id, :tags, :accessed_at])
+    |> cast(attrs, [:barcode, :price, :images, :categories, :provider, :url, :title, :description, :brand_id, :accessed_at])
     |> validate_required([:barcode, :price, :images, :categories, :provider, :url, :title, :description, :brand_id])
     |> validate_format(:barcode, ~r/^\d{8,128}$/, message: "barcode must be between 8 and 128 characters long, only made of digits")
     |> validate_length(:provider, max: 255)
@@ -53,9 +52,6 @@ defmodule DataReeler.Stores.Product do
       "<categories>" <>
         encode_xml_field(Enum.join(capitalize_each_element(product.translated_categories), ", ")) <>
       "</categories>" <>
-      "<tags>" <>
-        encode_xml_field(Enum.join(product.tags, ", ")) <>
-      "</tags>" <>
       "<brand>" <>
         encode_xml_field(product.brand.name) <>
       "</brand>" <>

@@ -97,18 +97,6 @@ defmodule DataReeler.Crawlers.Formaxstore do
         |> Enum.reject(&blank?/1)
         |> capitalize_first_element(),
 
-      tags:
-        document
-        |> Floki.find("table.product-attrbite-table")
-        |> Floki.find("tbody")
-        |> Floki.find("tr:not(.attr-brend)")
-        |> Floki.find("td > a")
-        |> Enum.map(&Floki.text/1)
-        |> List.flatten()
-        |> Enum.map(&String.trim/1)
-        |> Enum.reject(&blank?/1)
-        |> Enum.map(&String.downcase/1),
-
       url:
         response.request_url,
 

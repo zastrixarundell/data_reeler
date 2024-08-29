@@ -97,9 +97,6 @@ defmodule DataReeler.Crawlers.MozaikCentar do
         |> Enum.reject(&blank?/1)
         |> capitalize_first_element(),
 
-      tags:
-        [],
-
       url:
         response.request_url,
 
