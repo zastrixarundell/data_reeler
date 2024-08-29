@@ -10,18 +10,16 @@ defmodule DataReeler.Crawlers.MozaikCentar do
   def init() do
     urls =
       [
-        # "https://www.mozaikcentar.com/sr/proizvodi/stapovi",
-        # "https://www.mozaikcentar.com/sr/proizvodi/masinice",
-        # "https://www.mozaikcentar.com/sr/proizvodi/feeder-pecanje",
-        # "https://www.mozaikcentar.com/sr/proizvodi/somovska-oprema",
-        # "https://www.mozaikcentar.com/sr/proizvodi/varalice",
-        # "https://www.mozaikcentar.com/sr/proizvodi/najloni",
-        # "https://www.mozaikcentar.com/sr/proizvodi/udice",
-        # "https://www.mozaikcentar.com/sr/proizvodi/pribor",
-        # "https://www.mozaikcentar.com/sr/proizvodi/oprema",
-        # "https://www.mozaikcentar.com/sr/proizvodi/rezervni-delovi"
-        "https://www.mozaikcentar.com/sr/proizvod/masinica-noctis-mikado",
-        "https://www.mozaikcentar.com/sr/proizvod/spro-dynafil-powerbraid-300-m"
+        "https://www.mozaikcentar.com/sr/proizvodi/stapovi",
+        "https://www.mozaikcentar.com/sr/proizvodi/masinice",
+        "https://www.mozaikcentar.com/sr/proizvodi/feeder-pecanje",
+        "https://www.mozaikcentar.com/sr/proizvodi/somovska-oprema",
+        "https://www.mozaikcentar.com/sr/proizvodi/varalice",
+        "https://www.mozaikcentar.com/sr/proizvodi/najloni",
+        "https://www.mozaikcentar.com/sr/proizvodi/udice",
+        "https://www.mozaikcentar.com/sr/proizvodi/pribor",
+        "https://www.mozaikcentar.com/sr/proizvodi/oprema",
+        "https://www.mozaikcentar.com/sr/proizvodi/rezervni-delovi"
       ] ++ DataReeler.Stores.random_store_seed_urls("mozaik_centar")
 
     [
@@ -52,17 +50,17 @@ defmodule DataReeler.Crawlers.MozaikCentar do
 
   defp page_type(document) do
     product_page = Floki.find(document, "h1.product-name") |> Enum.any?()
-    # product_list = Floki.find(document, "a.filter-trigger.btn-t1.red") |> Enum.any?()
+    product_list = Floki.find(document, "a.filter-trigger.btn-t1.red") |> Enum.any?()
 
     cond do
       product_page -> :product_page
-      # product_list -> :product_list
+      product_list -> :product_list
       true -> :landing_page
     end
   end
 
   defp product_page(document, response) do
-    {[item!(document, response)], []}
+    {[item!(document, response)], item_urls!(document)}
   end
 
   def item!(document, response) do
@@ -150,19 +148,9 @@ defmodule DataReeler.Crawlers.MozaikCentar do
   end
 
   def item_urls!(document) do
-    similar_products = [
-      document
-      |> Floki.find(".similar-products-slider")
-      |> Floki.find(".item.product-item")
-      |> Floki.find(".img-wrapper > a")
-      |> Floki.attribute("href")]
-
     document
-    |> Floki.find(".product-details-related")
-    |> Floki.find("li.item > a")
+    |> Floki.find(".products-slider .text-block a")
     |> Floki.attribute("href")
-    |> Enum.concat(similar_products)
-    |> List.flatten()
     |> Enum.uniq()
     |> Enum.map(&build_absolute_url/1)
     |> Enum.map(&Crawly.Utils.request_from_url/1)
@@ -171,23 +159,13 @@ defmodule DataReeler.Crawlers.MozaikCentar do
   defp product_list_page(document, response) do
     item_cards =
       document
-      |> Floki.find(".item.product-item")
-      |> Floki.find(".img-wrapper > a")
-      |> Floki.attribute("href")
-
-    categories =
-      document
-      |> Floki.find("#nb_f-kategorije")
-      |> Floki.find("li > a")
+      |> Floki.find(".product-preview-item .text-block a")
       |> Floki.attribute("href")
 
     pagination =
       document
-      |> Floki.find("ul.pagination")
-      |> Floki.find("li.number:not(.number-dot)")
-      |> Floki.find("a")
-      |> Enum.map(&Floki.text(&1, [deep: false]))
-      |> Enum.map(&String.trim/1)
+      |> Floki.find("ul.pagination-list > li > a")
+      |> Floki.attribute("data-ci-pagination-page")
       |> Enum.map(&String.to_integer/1)
       |> safe_max()
       |> build_page_numbers()
@@ -195,7 +173,6 @@ defmodule DataReeler.Crawlers.MozaikCentar do
 
     requests =
       item_cards
-      |> Enum.concat(categories)
       |> Enum.concat(pagination)
       |> Enum.uniq()
       |> Enum.map(&build_absolute_url/1)
@@ -219,12 +196,12 @@ defmodule DataReeler.Crawlers.MozaikCentar do
     response.request_url
     |> URI.parse()
     |> remove_uri_page()
-    |> URI.append_path("/page-#{page}")
+    |> URI.append_path("/#{page}")
     |> URI.to_string()
   end
 
   defp remove_uri_page(uri = %URI{path: path}) do
-    %URI{uri | path: String.replace(path, ~r/page-\d+\/?$/, "")}
+    %URI{uri | path: String.replace(path, ~r/\/\d+\/?$/, "")}
   end
 
   def build_absolute_url(url), do: URI.merge(base_url(), url) |> to_string()
