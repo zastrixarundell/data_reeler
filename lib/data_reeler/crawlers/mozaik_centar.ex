@@ -1,29 +1,29 @@
-defmodule DataReeler.Crawlers.Formaxstore do
+defmodule DataReeler.Crawlers.MozaikCentar do
   use DataReeler.Crawler
 
   import DataReeler.Utils.CrawlerHelpers
 
   @impl Crawly.Spider
-  def base_url(), do: "https://www.formaxstore.com/"
+  def base_url(), do: "https://www.mozaikcentar.com/"
 
   @impl Crawly.Spider
   def init() do
-    values =
-      with {:ok, %{body: body, status_code: 200}} <- HTTPoison.get("https://www.formaxstore.com"),
-           {:ok, document} <- Floki.parse_document(body) do
-        document
-        |> Floki.find(".nav-main.list-inline")
-        |> Floki.find(".level4")
-        |> Floki.find("ul.nav-main-submenu")
-        |> Floki.find("li > a")
-        |> Floki.attribute("href")
-      else
-        _ ->
-          []
-      end
+    urls =
+      [
+        "https://www.mozaikcentar.com/sr/proizvodi/stapovi",
+        "https://www.mozaikcentar.com/sr/proizvodi/masinice",
+        "https://www.mozaikcentar.com/sr/proizvodi/feeder-pecanje",
+        "https://www.mozaikcentar.com/sr/proizvodi/somovska-oprema",
+        "https://www.mozaikcentar.com/sr/proizvodi/varalice",
+        "https://www.mozaikcentar.com/sr/proizvodi/najloni",
+        "https://www.mozaikcentar.com/sr/proizvodi/udice",
+        "https://www.mozaikcentar.com/sr/proizvodi/pribor",
+        "https://www.mozaikcentar.com/sr/proizvodi/oprema",
+        "https://www.mozaikcentar.com/sr/proizvodi/rezervni-delovi"
+      ] ++ DataReeler.Stores.random_store_seed_urls("mozaik_centar")
 
     [
-      start_urls: values ++ ["https://www.formaxstore.com"] ++ DataReeler.Stores.random_store_seed_urls("formaxstore")
+      start_urls: urls
     ]
   end
 
@@ -49,9 +49,8 @@ defmodule DataReeler.Crawlers.Formaxstore do
   end
 
   defp page_type(document) do
-    product_page = Floki.find(document, ".product-information-wrapper") |> Enum.any?()
-    product_list = Floki.find(document, ".tp-product_list") |> Enum.any?()
-    # landing_page = Floki.find(document, ".heading-wrapper.heading-wrapper-bordered") |> Enum.empty?()
+    product_page = Floki.find(document, "h1.product-name") |> Enum.any?()
+    product_list = Floki.find(document, "a.filter-trigger.btn-t1.red") |> Enum.any?()
 
     cond do
       product_page -> :product_page
@@ -68,15 +67,14 @@ defmodule DataReeler.Crawlers.Formaxstore do
     %{
       title:
         document
-        |> Floki.find(".heading-wrapper")
-        |> Floki.find(".title")
-        |> Floki.find("h1")
+        |> Floki.find("h1.product-name")
         |> Floki.text()
         |> String.trim(),
 
       description:
         document
-        |> Floki.find("#tab_product_description")
+        |> Floki.find(".description")
+        |> Floki.find("p")
         |> Enum.map(&Floki.text/1)
         |> Enum.map(&String.split(&1,"\n"))
         |> List.flatten()
@@ -85,13 +83,15 @@ defmodule DataReeler.Crawlers.Formaxstore do
 
       barcode:
         document
-        |> Floki.find(".product-details-info > .code > .code")
-        |> floki_regex_extraction(~r/barkod: *?(\d{8,128})/i),
+        |> Floki.find("section.product-description-tabs-section")
+        |> Floki.find("p")
+        |> floki_regex_extraction(~r/(barkod *(artikla)?|ean):? *?(\d{8,128})/i),
 
       categories:
         document
-        |> Floki.find(".block.breadcrumbs li:not(.active)")
-        |> Enum.drop(2)
+        |> Floki.find("section.breadcrumbs a")
+        |> IO.inspect()
+        |> Enum.drop(1)
         |> Enum.map(&Floki.text/1)
         |> Enum.map(&String.trim/1)
         |> Enum.reject(&blank?/1)
@@ -101,43 +101,27 @@ defmodule DataReeler.Crawlers.Formaxstore do
         response.request_url,
 
       provider:
-        "formaxstore",
+        "mozaik_centar",
 
       brand_name:
         document
-        |> Floki.find(".heading-wrapper")
-        |> Floki.find(".brand")
-        |> List.first()
+        |> Floki.find(".price-block > p.price > a")
         |> Floki.text()
         |> String.trim(),
 
       images:
         document
-        |> Floki.find(".product-image-wrapper")
+        |> Floki.find("#glasscase")
         |> Floki.find("img")
         |> Floki.attribute("src")
         |> Enum.map(fn path -> build_absolute_url(path) end),
 
       price: (
-        prices_holder =
-          document
-          |> Floki.find(".product-information-wrapper")
-          |> Floki.find(".product-details-price")
-
-        price_no_discount =
-          prices_holder
-          |> Floki.find("span.value.product-price-without-discount-value")
-
-        price =
-          prices_holder
-          |> Floki.find("span.value.product-price-value")
-
-        price_no_discount
-        |> Enum.concat(price)
-        |> Enum.map(&Floki.text(&1, deep: false))
-        |> Enum.map(&String.trim/1)
-        |> Enum.map(&normalize_price/1)
-        |> Enum.uniq()
+        document
+        |> Floki.find(".price-block > p.price")
+        |> floki_regex_extraction(~r/([\d\.,]+) *RSD *$/i)
+        |> normalize_price()
+        |> List.wrap()
       )
     }
   end
@@ -161,19 +145,9 @@ defmodule DataReeler.Crawlers.Formaxstore do
   end
 
   def item_urls!(document) do
-    similar_products = [
-      document
-      |> Floki.find(".similar-products-slider")
-      |> Floki.find(".item.product-item")
-      |> Floki.find(".img-wrapper > a")
-      |> Floki.attribute("href")]
-
     document
-    |> Floki.find(".product-details-related")
-    |> Floki.find("li.item > a")
+    |> Floki.find(".products-slider .text-block a")
     |> Floki.attribute("href")
-    |> Enum.concat(similar_products)
-    |> List.flatten()
     |> Enum.uniq()
     |> Enum.map(&build_absolute_url/1)
     |> Enum.map(&Crawly.Utils.request_from_url/1)
@@ -182,23 +156,13 @@ defmodule DataReeler.Crawlers.Formaxstore do
   defp product_list_page(document, response) do
     item_cards =
       document
-      |> Floki.find(".item.product-item")
-      |> Floki.find(".img-wrapper > a")
-      |> Floki.attribute("href")
-
-    categories =
-      document
-      |> Floki.find("#nb_f-kategorije")
-      |> Floki.find("li > a")
+      |> Floki.find(".product-preview-item .text-block a")
       |> Floki.attribute("href")
 
     pagination =
       document
-      |> Floki.find("ul.pagination")
-      |> Floki.find("li.number:not(.number-dot)")
-      |> Floki.find("a")
-      |> Enum.map(&Floki.text(&1, [deep: false]))
-      |> Enum.map(&String.trim/1)
+      |> Floki.find("ul.pagination-list > li > a")
+      |> Floki.attribute("data-ci-pagination-page")
       |> Enum.map(&String.to_integer/1)
       |> safe_max()
       |> build_page_numbers()
@@ -206,7 +170,6 @@ defmodule DataReeler.Crawlers.Formaxstore do
 
     requests =
       item_cards
-      |> Enum.concat(categories)
       |> Enum.concat(pagination)
       |> Enum.uniq()
       |> Enum.map(&build_absolute_url/1)
@@ -230,12 +193,12 @@ defmodule DataReeler.Crawlers.Formaxstore do
     response.request_url
     |> URI.parse()
     |> remove_uri_page()
-    |> URI.append_path("/page-#{page}")
+    |> URI.append_path("/#{page}")
     |> URI.to_string()
   end
 
   defp remove_uri_page(uri = %URI{path: path}) do
-    %URI{uri | path: String.replace(path, ~r/page-\d+\/?$/, "")}
+    %URI{uri | path: String.replace(path, ~r/\/\d+\/?$/, "")}
   end
 
   def build_absolute_url(url), do: URI.merge(base_url(), url) |> to_string()

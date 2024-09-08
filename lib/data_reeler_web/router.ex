@@ -4,6 +4,18 @@ defmodule DataReelerWeb.Router do
   pipeline :api do
     plug :accepts, ["json"]
   end
+  
+  pipeline :feed do
+    plug :accepts, ["xml"]
+  end
+  
+  scope "/feed", DataReelerWeb do
+    pipe_through :feed
+
+    get "/items", ProductController, :index
+    
+    get "/stores/:store", StoreController, :show
+  end
 
   scope "/api", DataReelerWeb do
     pipe_through :api

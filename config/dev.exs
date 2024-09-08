@@ -1,14 +1,21 @@
 import Config
 
 # Configure your database
-config :data_reeler, DataReeler.Repo,
-  username: "postgres",
-  password: "postgres",
-  hostname: "localhost",
-  database: "data_reeler_dev",
-  stacktrace: true,
-  show_sensitive_data_on_connection_error: true,
-  pool_size: 10
+case System.get_env("DATABASE_URL") do
+  nil ->
+    config :data_reeler, DataReeler.Repo,
+      username: "postgres",
+      password: "postgres",
+      hostname: "localhost",
+      database: "data_reeler_dev",
+      stacktrace: true,
+      show_sensitive_data_on_connection_error: true,
+      pool_size: 10
+  url ->
+    config :data_reeler, DataReeler.Repo,
+      url: url,
+      pool_size: 10
+end
 
 # For development, we disable any cache and enable
 # debugging and code reloading.

@@ -23,17 +23,6 @@ Erlang/OTP 26 [erts-14.2.1] [source] [64-bit] [smp:8:8] [ds:8:8:10] [async-threa
 Elixir 1.16.0 (compiled with Erlang/OTP 24)
 ```
 
-### Browserless.io
-
-To be able to load dynamic JavaScript content [browserless.io](
-) needs to be used. Also for extra security `podman` is used instead of `docker`.
-
-To start splash run the command:
-
-```bash
-podman run -d -e CONCURRENT=8 -e PREBOOT_QUANTITY=8 --restart always -p 3000:3000 --name browserless browserless/chrome:latest
-```
-
 `CONCURRENT` is the amount of active connections. Generally 4 should be used per service, so just multiply the amount of services by 4 for this value.
 
 `PREBOOT_QUANTITY` should *probably* be the amount of active chrome browsers at any time, although it might not work because of bad documentation.
@@ -54,11 +43,28 @@ mix elasticsearch.build products --cluster DataReeler.Elasticsearch.Cluster
 
 ### Starting the crawlers
 
-To start the crawlers, run this command:
+To start all crawlers, run this command:
 
-`mix data_reeler.crawlers`
+```bash
+mix data_reeler.crawlers
+```
 
-Or alternatively if `DECOUPLED_CRAWLERS` is set to `false`, it will run the crawlers with the application.
+Or alternatively if `DECOUPLED_CRAWLERS` is set to `false`, it will run the crawlers alongside the server.
+
+To start an individual crawler, head to the [Server](./lib/data_reeler/servers/) folder and find the last part of the module CamelCase name. Example: `DataReeler.Servers.MyStore`. Then run the following comamnd:
+
+```bash
+mix data_reeler.crawlers --crawler my_store
+```
+
+You can also run multiple crawlers like this:
+
+```bash
+mix data_reeler.crawlers \
+  --crawler my_store \
+  --crawler another_store \
+  --crawler yet_another_store
+```
 
 ## Starting the server
 

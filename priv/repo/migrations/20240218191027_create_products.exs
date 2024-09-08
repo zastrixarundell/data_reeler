@@ -11,8 +11,8 @@ defmodule DataReeler.Repo.Migrations.CreateProducts do
       add :url, :string
       add :title, :string
       add :description, {:array, :text}
-      
-      unique_index(:products, [:sku, :provider], name: :unique_sku_on_provider)
+
+      unique_index(:products, [:isbn, :provider], name: :unique_isbn_on_provider)
 
       timestamps(type: :utc_datetime)
     end
