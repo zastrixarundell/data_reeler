@@ -46,6 +46,7 @@ defmodule DataReeler.ProductConsumer do
   def handle_batch(_, messages, _, _) do
     # IO.inspect(messages, label: "Batch of messages")
       Enum.map(messages, fn %{data: {changeset, brand_name}} -> {changeset, brand_name} end)
+      |> Enum.uniq() # Remove duplicates in the batch, can happen when multiple crawlers send same item
       |> DB.upsert_products()
     messages
   end
