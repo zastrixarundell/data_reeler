@@ -55,7 +55,8 @@ defmodule DataReeler.MixProject do
       {:dns_cluster, "~> 0.1.1"},
       {:bandit, ">= 0.0.0"},
       {:elasticsearch, "~> 1.0.0"},
-      {:xmlrpc, "~> 1.3"}
+      {:xmlrpc, "~> 1.3"},
+      {:sobelow, "~> 0.14.1", only: [:dev, :test], runtime: false, warn_if_outdated: true}
     ]
   end
 
