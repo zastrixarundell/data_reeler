@@ -40,6 +40,10 @@ config :crawly,
     DataReeler.Pipelines.SendToAmpq,
     Crawly.Pipelines.JSONEncoder
   ],
+  middlewares: [
+    Crawly.Middlewares.DomainFilter,
+    Crawly.Middlewares.UniqueRequest
+  ],
   start_http_api?: false
 
 # Import environment specific config. This must remain at the bottom
