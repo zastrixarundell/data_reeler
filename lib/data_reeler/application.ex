@@ -10,6 +10,7 @@ defmodule DataReeler.Application do
     children = [
       DataReelerWeb.Telemetry,
       DataReeler.Repo,
+      DataReeler.AmpqConnection,
       {DNSCluster, query: Application.get_env(:data_reeler, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: DataReeler.PubSub},
       # Start a worker by calling: DataReeler.Worker.start_link(arg)
@@ -17,7 +18,7 @@ defmodule DataReeler.Application do
       # Start to serve requests, typically the last entry
       DataReelerWeb.Endpoint
     ]
-    
+
     children =
       children
       |> conditional_append(should_start_crawlers?(), crawler_list())
@@ -28,18 +29,18 @@ defmodule DataReeler.Application do
     opts = [strategy: :one_for_one, name: DataReeler.Supervisor]
     Supervisor.start_link(children, opts)
   end
-  
+
   defp conditional_append(children, true, new_children) do
     children ++ new_children
   end
-  
+
   defp conditional_append(children, false, _),
     do: children
-  
+
   defp should_start_crawlers?() do
     Application.get_env(:data_reeler, :called_in_task) == true or Application.get_env(:data_reeler, :decoupled_crawlers) == "false"
   end
-  
+
   defp crawler_list() do
     Application.get_env(
       :data_reeler,
@@ -51,7 +52,7 @@ defmodule DataReeler.Application do
       ]
     )
   end
-  
+
   defp should_start_elasticsearch?() do
     System.get_env("ELASTICSEARCH_URL") |> is_nil() |> Kernel.!()
   end
