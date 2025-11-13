@@ -39,7 +39,8 @@ config :crawly,
     # DataReeler.Pipelines.ProductDatabase,
     DataReeler.Pipelines.SendToAmpq,
     Crawly.Pipelines.JSONEncoder
-  ]
+  ],
+  start_http_api?: false
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
