@@ -5,7 +5,7 @@ defmodule DataReeler.MixProject do
     [
       app: :data_reeler,
       version: "0.1.0",
-      elixir: "~> 1.14",
+      elixir: "~> 1.19.2",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
@@ -23,7 +23,7 @@ defmodule DataReeler.MixProject do
       extra_applications: [:logger, :runtime_tools]
     ]
   end
-  
+
   def releases do
     [
       prod: [
