@@ -57,7 +57,9 @@ defmodule DataReeler.MixProject do
       {:elasticsearch, "~> 1.0.0"},
       {:xmlrpc, "~> 1.3"},
       {:sobelow, "~> 0.14.1", only: [:dev, :test], runtime: false, warn_if_outdated: true},
-      {:credo, "~> 1.7", only: [:dev, :test], runtime: false}
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+      {:broadway, "~> 1.0"},
+      {:broadway_rabbitmq, "~> 0.8.2"}
     ]
   end
 
