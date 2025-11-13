@@ -4,7 +4,7 @@ defmodule DataReeler.Stores.Brand do
 
   schema "brands" do
     field :name, :string
-    
+
     has_many :products, DataReeler.Stores.Product
 
     timestamps(type: :utc_datetime)
@@ -16,5 +16,6 @@ defmodule DataReeler.Stores.Brand do
     |> cast(attrs, [:name])
     |> validate_length(:name, max: 255)
     |> validate_required([:name])
+    |> unique_constraint(:name)
   end
 end

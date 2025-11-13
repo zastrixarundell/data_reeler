@@ -17,7 +17,7 @@ defmodule DataReeler.Pipelines.SendToAmpq do
         |> Product.changeset(item)
 
     if as_product.valid? do
-      item = Map.put(item, :crawled_at, DateTime.utc_now())
+      item = Map.put(item, :accessed_at, NaiveDateTime.utc_now(:second))
       DataReeler.AmpqConnection.send_message("crawled_results", item)
     end
 

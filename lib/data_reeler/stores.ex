@@ -45,6 +45,56 @@ defmodule DataReeler.Stores do
     end
   end
 
+  def upsert_products(changeset_and_brand_list) do
+    alias Ecto.Multi
+
+    Multi.new()
+    |> Multi.run(:find_or_insert_brands, fn repo, _changes ->
+      now = DateTime.utc_now(:second)
+
+      brand_names =
+        changeset_and_brand_list
+        |> Enum.map(fn {_changeset, brand_name} -> brand_name end)
+        |> Enum.uniq()
+
+      brand_changesets =
+        brand_names
+        |> Enum.map(&%{name: &1, inserted_at: now, updated_at: now})
+
+      repo.insert_all(Brand, brand_changesets, on_conflict: :nothing, conflict_target: :name)
+
+      brands =
+        repo.all(from b in Brand, where: b.name in ^brand_names, select: {b.name, b.id})
+        |> Map.new()
+
+      {:ok, brands}
+    end)
+    |> Multi.run(:upsert_products, fn repo, %{find_or_insert_brands: brands} ->
+      now = DateTime.utc_now(:second)
+
+      products =
+        Enum.map(changeset_and_brand_list, fn {changeset, brand_name} ->
+          changeset
+          |> Ecto.Changeset.put_change(:brand_id, Map.fetch!(brands, brand_name))
+          |> Ecto.Changeset.put_change(:inserted_at, now)
+          |> Ecto.Changeset.put_change(:updated_at, now)
+          |> Ecto.Changeset.apply_changes()
+          |> Map.from_struct()
+          |> Map.drop([:__meta__, :__struct__, :brand, :brand_name, :translated_categories, :id])
+        end)
+
+      try do
+        result = repo.insert_all(Product, products, on_conflict: {:replace_all_except, [:inserted_at]}, conflict_target: [:barcode, :provider])
+        {:ok, result}
+      rescue
+        exception in Postgrex.Error ->
+          Logger.error("Failed to upsert products: #{Exception.message(exception)}")
+          {:error, exception}
+      end
+    end)
+    |> Repo.transaction()
+  end
+
   @doc """
   Get random product URLs from the database for the given provider.
   """
