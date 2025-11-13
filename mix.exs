@@ -56,7 +56,8 @@ defmodule DataReeler.MixProject do
       {:bandit, ">= 0.0.0"},
       {:elasticsearch, "~> 1.0.0"},
       {:xmlrpc, "~> 1.3"},
-      {:sobelow, "~> 0.14.1", only: [:dev, :test], runtime: false, warn_if_outdated: true}
+      {:sobelow, "~> 0.14.1", only: [:dev, :test], runtime: false, warn_if_outdated: true},
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false}
     ]
   end
 
