@@ -41,7 +41,7 @@ defmodule DataReeler.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:crawly, "~> 0.16.0"},
+      {:crawly, "~> 0.17.0"},
       {:floki, "~> 0.33.0"},
       {:phoenix, "~> 1.7.10"},
       {:phoenix_ecto, "~> 4.4"},

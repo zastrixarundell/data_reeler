@@ -34,6 +34,12 @@ config :mime, :types, %{
   "application/xml" => ["xml"]
 }
 
+config :crawly,
+  pipelines: [
+    DataReeler.Pipelines.ProductDatabase,
+    Crawly.Pipelines.JSONEncoder
+  ]
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"

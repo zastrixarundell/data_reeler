@@ -24,18 +24,14 @@ concurrent_crawlers =
     """
 
 config :crawly,
-  concurrent_requests_per_domain: String.to_integer(concurrent_crawlers),
-  pipelines: [
-    DataReeler.Pipelines.ProductDatabase,
-    Crawly.Pipelines.JSONEncoder
-  ]
-  
+  concurrent_requests_per_domain: String.to_integer(concurrent_crawlers)
+
 server_backoff =
   System.get_env("CHECK_BACKOFF_HOURS") ||
     raise """
     You need to specify CHECK_BACKOFF_HOURS, the amount of hours between checks for stores.
     """
-    
+
 decoupled_crawlers =
   System.get_env("DECOUPLED_CRAWLERS") ||
     raise """
@@ -45,9 +41,9 @@ decoupled_crawlers =
 config :data_reeler,
   server_backoff: String.to_integer(server_backoff),
   decoupled_crawlers: decoupled_crawlers
-  
+
 elasticsearch_url = System.get_env("ELASTICSEARCH_URL")
-  
+
 config :data_reeler, DataReeler.Elasticsearch.Cluster,
   # The URL where Elasticsearch is hosted on your system
   url: elasticsearch_url,
