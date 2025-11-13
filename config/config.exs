@@ -36,7 +36,8 @@ config :mime, :types, %{
 
 config :crawly,
   pipelines: [
-    DataReeler.Pipelines.ProductDatabase,
+    # DataReeler.Pipelines.ProductDatabase,
+    DataReeler.Pipelines.SendToAmpq,
     Crawly.Pipelines.JSONEncoder
   ]
 
